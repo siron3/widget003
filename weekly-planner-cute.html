@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #a8d8ea;
+    --sky-light: #d6eef8;
+    --sky-pale: #eef7fc;
+    --brown: #8b6f5e;
+    --brown-light: #c4a882;
+    --brown-pale: #f5ede6;
+    --cream: #fdf8f3;
+    --blush: #f2c4b8;
+    --mint: #b8dfd0;
+    --lavender: #d4c5e8;
+    --yellow: #fce8a2;
+    --pool-accent: #c4a882;
+    --pool-soft: rgba(196,168,130,0.12);
+    --text: #4a3728;
+    --text-muted: #9e7c6a;
+    --text-light: #c4a882;
+    --white: #ffffff;
+    --border: rgba(139,111,94,0.15);
+    --border-today: rgba(168,216,234,0.6);
+    --shadow: rgba(139, 111, 94, 0.10);
+    --drag-highlight: rgba(168,216,234,0.20);
+    --radius: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    background: var(--sky-pale);
+    min-height: 100vh;
+    padding: 20px 16px 36px;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .widget { max-width: 980px; margin: 0 auto; }
+
+  /* ── Header ── */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; padding: 0 2px;
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .header-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px; color: var(--brown);
+    letter-spacing: -0.01em;
+  }
+  .header-deco { font-size: 10px; color: var(--brown-light); letter-spacing: 0.2em; }
+  .week-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+  .nav-buttons { display: flex; align-items: center; gap: 4px; }
+  .nav-btn {
+    width: 28px; height: 28px; border: 1.5px solid var(--border);
+    background: var(--white); border-radius: 8px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); transition: all 0.15s ease;
+  }
+  .nav-btn:hover { background: var(--sky-pale); border-color: var(--sky); color: var(--brown); }
+  .nav-btn svg { width: 14px; height: 14px; }
+  .today-btn {
+    font-size: 11px; font-weight: 700; padding: 4px 10px;
+    border: 1.5px solid var(--border); background: var(--white);
+    border-radius: 8px; cursor: pointer; color: var(--text-muted);
+    font-family: 'Zen Maru Gothic', sans-serif;
+    transition: all 0.15s ease;
+  }
+  .today-btn:hover { background: var(--sky-pale); border-color: var(--sky); color: var(--brown); }
+
+  /* ── Grid Layout ── */
+  .row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  /* ── Day Column ── */
+  .day-col {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    min-height: 240px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 10px var(--shadow);
+  }
+  .day-col:hover { border-color: var(--sky); }
+  .day-col.is-today {
+    border-color: var(--sky);
+    box-shadow: 0 2px 14px rgba(168,216,234,0.35);
+    background: linear-gradient(180deg, rgba(168,216,234,0.08) 0%, var(--white) 100%);
+  }
+  .day-col.is-weekend .day-header { background: rgba(242,196,184,0.12); }
+  .day-col.is-holiday .day-header { background: rgba(242,196,184,0.12); }
+  .day-col.drag-over {
+    border-color: var(--sky);
+    border-style: dashed;
+    background: var(--drag-highlight);
+  }
+
+  .day-header {
+    padding: 10px 10px 8px;
+    text-align: center;
+    border-bottom: 1.5px solid var(--border);
+    background: rgba(255,255,255,0.5);
+    position: relative;
+  }
+  .day-col.is-today .day-header { border-bottom-color: rgba(168,216,234,0.4); }
+
+  .day-name {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--text-light); margin-bottom: 3px;
+  }
+  .day-col.is-today .day-name { color: var(--sky); }
+  .day-col.is-weekend .day-name,
+  .day-col.is-holiday .day-name { color: var(--blush); }
+
+  .day-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; color: var(--text); line-height: 1;
+  }
+  .day-col.is-today .day-number { color: var(--sky); }
+  .day-col.is-weekend .day-number,
+  .day-col.is-holiday .day-number { color: #c4756a; }
+
+  .holiday-label {
+    font-size: 8.5px; color: #c4756a; margin-top: 2px;
+    font-weight: 500; line-height: 1.2;
+  }
+
+  .day-dot {
+    position: absolute; top: 8px; right: 8px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--sky);
+  }
+
+  /* ── Task List ── */
+  .task-list {
+    padding: 6px; flex: 1;
+    display: flex; flex-direction: column; gap: 1px;
+    min-height: 40px;
+  }
+
+  .task-item {
+    display: flex; align-items: flex-start; gap: 5px;
+    padding: 5px 4px; border-radius: 8px;
+    transition: background 0.1s; cursor: default;
+    animation: taskIn 0.2s ease; user-select: none;
+  }
+  @keyframes taskIn {
+    from { opacity: 0; transform: translateY(-3px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .task-item:hover { background: var(--sky-pale); }
+  .task-item.dragging { opacity: 0.3; }
+  .task-item.drop-above { box-shadow: 0 -2px 0 0 var(--sky); }
+  .task-item.drop-below { box-shadow: 0 2px 0 0 var(--sky); }
+  .task-item.from-pool { border-left: 2px solid var(--pool-accent); padding-left: 6px; }
+
+  .drag-handle {
+    width: 12px; min-width: 12px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: grab; color: var(--text-light); opacity: 0;
+    transition: opacity 0.1s; margin-top: 1px;
+  }
+  .drag-handle:active { cursor: grabbing; }
+  .task-item:hover .drag-handle { opacity: 0.6; }
+  .drag-handle svg { width: 8px; height: 12px; }
+
+  .task-cb {
+    width: 15px; height: 15px; min-width: 15px;
+    border: 1.5px solid var(--text-light); border-radius: 4px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    margin-top: 1px; background: var(--white);
+    flex-shrink: 0;
+  }
+  .task-cb:hover { border-color: var(--sky); background: var(--sky-pale); }
+  .task-cb.checked {
+    background: var(--sky); border-color: var(--sky);
+    transform: scale(1.1);
+  }
+  .task-cb.checked svg { opacity: 1; }
+  .task-cb svg { width: 9px; height: 9px; opacity: 0; color: white; transition: opacity 0.15s; }
+
+  .task-text {
+    font-size: 11.5px; line-height: 1.5; color: var(--text);
+    flex: 1; word-break: break-word; outline: none;
+  }
+  .task-text.done { text-decoration: line-through; color: var(--text-light); }
+
+  .task-del {
+    width: 16px; height: 16px; min-width: 16px; border: none;
+    background: transparent; cursor: pointer; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: all 0.1s; color: var(--text-light); margin-top: 1px;
+  }
+  .task-item:hover .task-del { opacity: 1; }
+  .task-del:hover { background: rgba(242,196,184,0.4); color: #c4756a; }
+  .task-del svg { width: 10px; height: 10px; }
+
+  .add-task-btn {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 6px; border: none; background: transparent;
+    cursor: pointer; border-radius: 8px; color: var(--text-light);
+    font-size: 11px; font-family: 'Zen Maru Gothic', sans-serif;
+    transition: all 0.15s; width: 100%; text-align: left; margin-top: 2px;
+  }
+  .add-task-btn:hover { background: var(--sky-pale); color: var(--brown); }
+  .add-task-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+  /* ── Pool Column ── */
+  .pool-col {
+    background: var(--white);
+    border: 1.5px solid rgba(196,168,130,0.3);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    min-height: 240px;
+    box-shadow: 0 2px 10px var(--shadow);
+    transition: border-color 0.2s;
+  }
+  .pool-col.drag-over {
+    border-color: var(--pool-accent);
+    border-style: dashed;
+    background: var(--pool-soft);
+  }
+
+  .pool-header {
+    padding: 10px 12px 8px;
+    border-bottom: 1.5px solid rgba(196,168,130,0.2);
+    background: rgba(245,237,230,0.5);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .pool-title {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--pool-accent); display: flex; align-items: center; gap: 4px;
+  }
+  .pool-title-icon { font-size: 11px; }
+  .pool-count {
+    font-size: 10px; font-weight: 700;
+    background: var(--brown-pale); color: var(--pool-accent);
+    padding: 2px 7px; border-radius: 99px;
+  }
+
+  .pool-list { padding: 6px; flex: 1; display: flex; flex-direction: column; gap: 1px; }
+
+  .pool-item {
+    display: flex; align-items: flex-start; gap: 5px;
+    padding: 5px 4px; border-radius: 8px;
+    cursor: grab; transition: background 0.1s;
+    animation: taskIn 0.2s ease; user-select: none;
+    border-left: 2px solid transparent;
+  }
+  .pool-item:hover { background: var(--brown-pale); border-left-color: var(--pool-accent); }
+  .pool-item:active { cursor: grabbing; }
+  .pool-item.dragging { opacity: 0.3; }
+  .pool-item.drop-above { box-shadow: 0 -2px 0 0 var(--pool-accent); }
+  .pool-item.drop-below { box-shadow: 0 2px 0 0 var(--pool-accent); }
+
+  .pool-handle {
+    width: 12px; min-width: 12px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-light); opacity: 0;
+    transition: opacity 0.1s; margin-top: 1px;
+  }
+  .pool-item:hover .pool-handle { opacity: 0.6; }
+  .pool-handle svg { width: 8px; height: 12px; }
+
+  .pool-text {
+    font-size: 11.5px; line-height: 1.5; color: var(--text);
+    flex: 1; word-break: break-word; outline: none;
+  }
+
+  .pool-del {
+    width: 16px; height: 16px; min-width: 16px; border: none;
+    background: transparent; cursor: pointer; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: all 0.1s; color: var(--text-light); margin-top: 1px;
+  }
+  .pool-item:hover .pool-del { opacity: 1; }
+  .pool-del:hover { background: rgba(242,196,184,0.4); color: #c4756a; }
+  .pool-del svg { width: 10px; height: 10px; }
+
+  .pool-add-btn {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 6px; border: none; background: transparent;
+    cursor: pointer; border-radius: 8px; color: var(--pool-accent);
+    font-size: 11px; font-family: 'Zen Maru Gothic', sans-serif;
+    transition: all 0.15s; width: 100%; text-align: left; margin: 2px 0 0;
+  }
+  .pool-add-btn:hover { background: var(--brown-pale); }
+  .pool-add-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+  .pool-hint {
+    padding: 6px 8px 8px;
+    font-size: 9.5px; color: var(--text-light);
+    text-align: center; line-height: 1.5;
+    border-top: 1px solid rgba(196,168,130,0.15);
+    margin-top: auto;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 10px; padding: 0 2px;
+  }
+  .progress-bg {
+    flex: 1; height: 6px; background: rgba(168,216,234,0.25);
+    border-radius: 99px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sky) 0%, var(--brown-light) 100%);
+    border-radius: 99px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .progress-text { font-size: 10.5px; color: var(--text-muted); font-weight: 500; white-space: nowrap; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--sky-pale); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--sky) 0%, var(--brown-light) 100%);
+    border-radius: 99px; border: 2px solid var(--sky-pale);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #7ec8e0 0%, #b8926a 100%); }
+  html { scrollbar-width: auto; scrollbar-color: var(--sky) var(--sky-pale); }
+</style>
+</head>
+<body>
+<div class="widget">
+  <div class="header">
+    <div class="header-left">
+      <div class="header-title">🗓 Weekly Planner</div>
+      <div class="header-deco">✦</div>
+      <div class="week-label" id="weekLabel"></div>
+    </div>
+    <div class="nav-buttons">
+      <button class="today-btn" onclick="goToday()">Today</button>
+      <button class="nav-btn" onclick="navigate(-1)" title="前の週">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="nav-btn" onclick="navigate(1)" title="次の週">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Row 1: Mon–Thu -->
+  <div class="row" id="rowTop"></div>
+  <!-- Row 2: Fri–Sun + Pool -->
+  <div class="row" id="rowBottom"></div>
+
+  <div class="footer">
+    <div class="progress-bg"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-text" id="progressText">No tasks yet</div>
+  </div>
+</div>
+
+<script>
+const DAY_NAMES_JP = ['日','月','火','水','木','金','土'];
+const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── Japanese Holidays ──
+function nthWeekday(year, month, weekday, n) {
+  const first = new Date(year, month - 1, 1);
+  let d = ((weekday - first.getDay()) + 7) % 7 + 1;
+  d += (n - 1) * 7;
+  return new Date(year, month - 1, d);
+}
+function vernalEquinox(y) {
+  if (y <= 1947) return null;
+  let d;
+  if (y <= 1979) d = Math.floor(20.8357 + 0.242194*(y-1980) - Math.floor((y-1983)/4));
+  else if (y <= 2099) d = Math.floor(20.8431 + 0.242194*(y-1980) - Math.floor((y-1980)/4));
+  else d = Math.floor(21.851 + 0.242194*(y-1980) - Math.floor((y-1980)/4));
+  return new Date(y, 2, d);
+}
+function autumnalEquinox(y) {
+  if (y <= 1947) return null;
+  let d;
+  if (y <= 1979) d = Math.floor(23.2588 + 0.242194*(y-1980) - Math.floor((y-1983)/4));
+  else if (y <= 2099) d = Math.floor(23.2488 + 0.242194*(y-1980) - Math.floor((y-1980)/4));
+  else d = Math.floor(24.2488 + 0.242194*(y-1980) - Math.floor((y-1980)/4));
+  return new Date(y, 8, d);
+}
+function getJapaneseHolidays(year) {
+  const holidays = {};
+  const addH = (m,d,name) => { holidays[`${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`] = name; };
+  addH(1,1,'元日'); addH(2,11,'建国記念の日'); addH(2,23,'天皇誕生日');
+  addH(4,29,'昭和の日'); addH(5,3,'憲法記念日'); addH(5,4,'みどりの日'); addH(5,5,'こどもの日');
+  addH(8,11,'山の日'); addH(11,3,'文化の日'); addH(11,23,'勤労感謝の日');
+  const seijin = nthWeekday(year,1,1,2); addH(1,seijin.getDate(),'成人の日');
+  const umi = nthWeekday(year,7,1,3); addH(7,umi.getDate(),'海の日');
+  const keirou = nthWeekday(year,9,1,3); addH(9,keirou.getDate(),'敬老の日');
+  const taiiku = nthWeekday(year,10,1,2); addH(10,taiiku.getDate(),'スポーツの日');
+  const ve = vernalEquinox(year); if(ve) addH(3,ve.getDate(),'春分の日');
+  const ae = autumnalEquinox(year); if(ae) addH(9,ae.getDate(),'秋分の日');
+  const baseKeys = Object.keys(holidays);
+  for(const key of baseKeys) {
+    const d = new Date(key+'T00:00:00');
+    if(d.getDay()===0) {
+      let next=new Date(d); next.setDate(next.getDate()+1);
+      let nk=dateKey(next);
+      while(holidays[nk]){ next.setDate(next.getDate()+1); nk=dateKey(next); }
+      holidays[nk]='振替休日';
+    }
+  }
+  for(const key of Object.keys(holidays)) {
+    const d=new Date(key+'T00:00:00'); const n2=new Date(d); n2.setDate(n2.getDate()+2);
+    if(holidays[dateKey(n2)]) {
+      const mid=new Date(d); mid.setDate(mid.getDate()+1); const mk=dateKey(mid);
+      if(!holidays[mk]&&mid.getDay()!==0&&mid.getDay()!==6) holidays[mk]='国民の休日';
+    }
+  }
+  return holidays;
+}
+const holidayCache = {};
+function getHoliday(d) {
+  const y=d.getFullYear();
+  if(!holidayCache[y]) holidayCache[y]=getJapaneseHolidays(y);
+  return holidayCache[y][dateKey(d)]||null;
+}
+
+// ── State ──
+let currentWeekStart = getMonday(new Date());
+let weekTasks = loadData('cute_week_tasks', {});
+let poolTasks = loadData('cute_pool_tasks', []);   // ← pool はリセットなし
+let dragState = null;
+
+function getMonday(d) {
+  const date=new Date(d); const day=date.getDay();
+  date.setDate(date.getDate()-day+(day===0?-6:1)); date.setHours(0,0,0,0);
+  return date;
+}
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function loadData(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch { return fallback; }
+}
+function saveWeek() { localStorage.setItem('cute_week_tasks', JSON.stringify(weekTasks)); }
+function savePool() { localStorage.setItem('cute_pool_tasks', JSON.stringify(poolTasks)); }
+function navigate(dir) {
+  currentWeekStart=new Date(currentWeekStart);
+  currentWeekStart.setDate(currentWeekStart.getDate()+dir*7);
+  render();
+}
+function goToday() { currentWeekStart=getMonday(new Date()); render(); }
+function isToday(d) {
+  const t=new Date();
+  return d.getFullYear()===t.getFullYear()&&d.getMonth()===t.getMonth()&&d.getDate()===t.getDate();
+}
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+// ── Week Task Actions ──
+function toggleTask(key,idx) {
+  if(weekTasks[key]?.[idx]) { weekTasks[key][idx].done=!weekTasks[key][idx].done; saveWeek(); render(); }
+}
+function deleteTask(key,idx) {
+  if(weekTasks[key]) {
+    weekTasks[key].splice(idx,1);
+    if(!weekTasks[key].length) delete weekTasks[key];
+    saveWeek(); render();
+  }
+}
+function addTask(key) {
+  if(!weekTasks[key]) weekTasks[key]=[];
+  const id=uid(); weekTasks[key].push({id, text:'', done:false});
+  saveWeek(); render();
+  setTimeout(()=>{ const el=document.querySelector(`[data-tid="${id}"] .task-text`); if(el) el.focus(); }, 50);
+}
+function updateTaskText(key,idx,text) {
+  if(weekTasks[key]?.[idx]) { weekTasks[key][idx].text=text; saveWeek(); }
+}
+function taskKeydown(e,key,idx) {
+  if(e.key==='Enter') { e.preventDefault(); addTask(key); }
+  if(e.key==='Backspace'&&weekTasks[key][idx].text==='') { e.preventDefault(); deleteTask(key,idx); }
+}
+
+// ── Pool Actions ──
+function addPoolTask() {
+  const id=uid(); poolTasks.push({id, text:''});
+  savePool(); render();
+  setTimeout(()=>{ const el=document.querySelector(`[data-pid="${id}"] .pool-text`); if(el) el.focus(); }, 50);
+}
+function updatePoolText(idx,text) { if(poolTasks[idx]) { poolTasks[idx].text=text; savePool(); } }
+function deletePoolTask(idx) { poolTasks.splice(idx,1); savePool(); render(); }
+function poolKeydown(e,idx) {
+  if(e.key==='Enter') { e.preventDefault(); addPoolTask(); }
+  if(e.key==='Backspace'&&poolTasks[idx].text==='') { e.preventDefault(); deletePoolTask(idx); }
+}
+
+// ── Drag & Drop ──
+function onTaskDragStart(e, key, idx) {
+  dragState = { source:'week', key, idx, data:{...weekTasks[key][idx]} };
+  e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain','');
+  requestAnimationFrame(()=>{ e.target.closest('.task-item')?.classList.add('dragging'); });
+}
+function onPoolDragStart(e, idx) {
+  dragState = { source:'pool', idx, data:{...poolTasks[idx]} };
+  e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain','');
+  requestAnimationFrame(()=>{ e.target.closest('.pool-item')?.classList.add('dragging'); });
+}
+function onDragEnd() {
+  dragState=null;
+  document.querySelectorAll('.dragging,.drag-over,.drop-above,.drop-below')
+    .forEach(el=>el.classList.remove('dragging','drag-over','drop-above','drop-below'));
+}
+
+// Drop on day column
+function onColDragOver(e) {
+  e.preventDefault(); e.dataTransfer.dropEffect='move';
+  const col=e.target.closest('.day-col');
+  if(col){
+    document.querySelectorAll('.day-col.drag-over').forEach(el=>{ if(el!==col)el.classList.remove('drag-over'); });
+    col.classList.add('drag-over');
+  }
+  document.querySelectorAll('.drop-above,.drop-below').forEach(el=>el.classList.remove('drop-above','drop-below'));
+  const ti=e.target.closest('.task-item');
+  if(ti){ const r=ti.getBoundingClientRect(); ti.classList.add(e.clientY<r.top+r.height/2?'drop-above':'drop-below'); }
+}
+function onColDragLeave(e) {
+  const col=e.target.closest('.day-col');
+  if(col&&!col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+}
+function onColDrop(e, targetKey) {
+  e.preventDefault();
+  if(!dragState) return;
+  const {source, key:srcKey, idx, data} = dragState;
+
+  let dropIdx=(weekTasks[targetKey]||[]).length;
+  const ti=e.target.closest('.task-item');
+  if(ti){ const i=parseInt(ti.dataset.idx,10); const r=ti.getBoundingClientRect(); dropIdx=e.clientY<r.top+r.height/2?i:i+1; }
+
+  // Remove from source
+  if(source==='pool') { poolTasks.splice(idx,1); savePool(); }
+  else if(source==='week') {
+    if(weekTasks[srcKey]){ weekTasks[srcKey].splice(idx,1); if(!weekTasks[srcKey].length) delete weekTasks[srcKey]; }
+    if(srcKey===targetKey && idx<dropIdx) dropIdx--;
+  }
+
+  if(!weekTasks[targetKey]) weekTasks[targetKey]=[];
+  weekTasks[targetKey].splice(dropIdx, 0, {id:uid(), text:data.text, done:data.done||false, fromPool:source==='pool'});
+  saveWeek(); dragState=null; render();
+}
+
+// Drop on pool
+function onPoolColDragOver(e) {
+  e.preventDefault(); e.dataTransfer.dropEffect='move';
+  const col=e.target.closest('.pool-col');
+  if(col) col.classList.add('drag-over');
+  document.querySelectorAll('.drop-above,.drop-below').forEach(el=>el.classList.remove('drop-above','drop-below'));
+  const pi=e.target.closest('.pool-item');
+  if(pi){ const r=pi.getBoundingClientRect(); pi.classList.add(e.clientY<r.top+r.height/2?'drop-above':'drop-below'); }
+}
+function onPoolColDragLeave(e) {
+  const col=e.target.closest('.pool-col');
+  if(col&&!col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+}
+function onPoolColDrop(e) {
+  e.preventDefault();
+  document.querySelectorAll('.pool-col.drag-over').forEach(el=>el.classList.remove('drag-over'));
+  if(!dragState) return;
+  const {source, key:srcKey, idx, data} = dragState;
+
+  let dropIdx=poolTasks.length;
+  const pi=e.target.closest('.pool-item');
+  if(pi){ const ti=parseInt(pi.dataset.pidx,10); const r=pi.getBoundingClientRect(); dropIdx=e.clientY<r.top+r.height/2?ti:ti+1; }
+
+  if(source==='pool') { poolTasks.splice(idx,1); if(idx<dropIdx) dropIdx--; }
+  else if(source==='week') {
+    if(weekTasks[srcKey]){ weekTasks[srcKey].splice(idx,1); if(!weekTasks[srcKey].length) delete weekTasks[srcKey]; saveWeek(); }
+  }
+  poolTasks.splice(dropIdx, 0, {id:uid(), text:data.text});
+  savePool(); dragState=null; render();
+}
+
+// ── Render helpers ──
+function renderDayCol(d, key) {
+  const dayTasks = weekTasks[key] || [];
+  const todayFlag = isToday(d);
+  const isWeekend = d.getDay()===0||d.getDay()===6;
+  const holiday = getHoliday(d);
+
+  let cls = 'day-col';
+  if(todayFlag) cls+=' is-today';
+  if(isWeekend) cls+=' is-weekend';
+  if(holiday) cls+=' is-holiday';
+
+  let tasksHtml = '';
+  dayTasks.forEach((task,idx)=>{
+    tasksHtml += `<div class="task-item${task.fromPool?' from-pool':''}" draggable="true"
+      data-tid="${task.id}" data-idx="${idx}"
+      ondragstart="onTaskDragStart(event,'${key}',${idx})"
+      ondragend="onDragEnd()">
+      <div class="drag-handle">
+        <svg viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="1.5" r="1"/><circle cx="6" cy="1.5" r="1"/><circle cx="2" cy="6" r="1"/><circle cx="6" cy="6" r="1"/><circle cx="2" cy="10.5" r="1"/><circle cx="6" cy="10.5" r="1"/></svg>
+      </div>
+      <div class="task-cb ${task.done?'checked':''}" onclick="toggleTask('${key}',${idx})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <div class="task-text ${task.done?'done':''}" contenteditable="true"
+        oninput="updateTaskText('${key}',${idx},this.textContent)"
+        onkeydown="taskKeydown(event,'${key}',${idx})">${task.text}</div>
+      <button class="task-del" onclick="deleteTask('${key}',${idx})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>`;
+  });
+
+  return `<div class="${cls}"
+    ondragover="onColDragOver(event)"
+    ondragleave="onColDragLeave(event)"
+    ondrop="onColDrop(event,'${key}')">
+    <div class="day-header">
+      <div class="day-name">${DAY_NAMES_JP[d.getDay()]}</div>
+      <div class="day-number">${d.getDate()}</div>
+      ${holiday?`<div class="holiday-label">${holiday}</div>`:''}
+      ${todayFlag?'<div class="day-dot"></div>':''}
+    </div>
+    <div class="task-list">${tasksHtml}</div>
+    <button class="add-task-btn" onclick="addTask('${key}')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      追加
+    </button>
+  </div>`;
+}
+
+function renderPoolCol() {
+  let itemsHtml = '';
+  poolTasks.forEach((task,idx)=>{
+    itemsHtml += `<div class="pool-item" draggable="true"
+      data-pid="${task.id}" data-pidx="${idx}"
+      ondragstart="onPoolDragStart(event,${idx})"
+      ondragend="onDragEnd()">
+      <div class="pool-handle">
+        <svg viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="1.5" r="1"/><circle cx="6" cy="1.5" r="1"/><circle cx="2" cy="6" r="1"/><circle cx="6" cy="6" r="1"/><circle cx="2" cy="10.5" r="1"/><circle cx="6" cy="10.5" r="1"/></svg>
+      </div>
+      <div class="pool-text" contenteditable="true"
+        oninput="updatePoolText(${idx},this.textContent)"
+        onkeydown="poolKeydown(event,${idx})">${task.text}</div>
+      <button class="pool-del" onclick="deletePoolTask(${idx})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>`;
+  });
+
+  return `<div class="pool-col"
+    ondragover="onPoolColDragOver(event)"
+    ondragleave="onPoolColDragLeave(event)"
+    ondrop="onPoolColDrop(event)">
+    <div class="pool-header">
+      <div class="pool-title"><span class="pool-title-icon">🗂</span> タスクプール</div>
+      <div class="pool-count">${poolTasks.length}</div>
+    </div>
+    <div class="pool-list">${itemsHtml}</div>
+    <button class="pool-add-btn" onclick="addPoolTask()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      追加
+    </button>
+    <div class="pool-hint">曜日欄にドラッグして振り分け✦</div>
+  </div>`;
+}
+
+function render() {
+  const rowTop = document.getElementById('rowTop');
+  const rowBottom = document.getElementById('rowBottom');
+
+  const weekEnd = new Date(currentWeekStart); weekEnd.setDate(weekEnd.getDate()+6);
+  document.getElementById('weekLabel').textContent =
+    `${MONTHS_EN[currentWeekStart.getMonth()]} ${currentWeekStart.getDate()} – ${MONTHS_EN[weekEnd.getMonth()]} ${weekEnd.getDate()}, ${weekEnd.getFullYear()}`;
+
+  // Build days: index 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
+  const days = [];
+  for(let i=0; i<7; i++){
+    const d=new Date(currentWeekStart); d.setDate(d.getDate()+i);
+    days.push({ d, key:dateKey(d) });
+  }
+
+  // Row top: Mon(0), Tue(1), Wed(2), Thu(3)
+  rowTop.innerHTML = days.slice(0,4).map(({d,key})=>renderDayCol(d,key)).join('');
+  // Row bottom: Fri(4), Sat(5), Sun(6), Pool
+  rowBottom.innerHTML = days.slice(4,7).map(({d,key})=>renderDayCol(d,key)).join('') + renderPoolCol();
+
+  // Progress (week tasks only)
+  let total=0, done=0;
+  Object.values(weekTasks).forEach(arr=>{ total+=arr.length; done+=arr.filter(t=>t.done).length; });
+  const pct = total>0 ? Math.round(done/total*100) : 0;
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressText').textContent = total>0 ? `${done}/${total} done ✦ ${pct}%` : 'タスクを追加してね ✦';
+}
+
+render();
+</script>
+</body>
+</html>
