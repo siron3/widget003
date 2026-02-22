@@ -7,336 +7,144 @@
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
   :root {
-    --sky: #a8d8ea;
-    --sky-light: #d6eef8;
-    --sky-pale: #eef7fc;
-    --brown: #8b6f5e;
-    --brown-light: #c4a882;
-    --brown-pale: #f5ede6;
-    --cream: #fdf8f3;
-    --blush: #f2c4b8;
-    --mint: #b8dfd0;
-    --lavender: #d4c5e8;
-    --yellow: #fce8a2;
-    --pool-accent: #c4a882;
-    --pool-soft: rgba(196,168,130,0.12);
-    --text: #4a3728;
-    --text-muted: #9e7c6a;
-    --text-light: #c4a882;
-    --white: #ffffff;
-    --border: rgba(139,111,94,0.15);
-    --border-today: rgba(168,216,234,0.6);
-    --shadow: rgba(139, 111, 94, 0.10);
-    --drag-highlight: rgba(168,216,234,0.20);
-    --radius: 14px;
+    --sky: #a8d8ea; --sky-light: #d6eef8; --sky-pale: #eef7fc;
+    --brown: #8b6f5e; --brown-light: #c4a882; --brown-pale: #f5ede6;
+    --cream: #fdf8f3; --blush: #f2c4b8; --mint: #b8dfd0;
+    --lavender: #d4c5e8; --yellow: #fce8a2;
+    --pool-accent: #c4a882; --pool-soft: rgba(196,168,130,0.12);
+    --text: #4a3728; --text-muted: #9e7c6a; --text-light: #c4a882;
+    --white: #ffffff; --border: rgba(139,111,94,0.15);
+    --border-today: rgba(168,216,234,0.6); --shadow: rgba(139,111,94,0.10);
+    --drag-highlight: rgba(168,216,234,0.20); --radius: 14px;
+    --top3: #c47ec0;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Zen Maru Gothic', sans-serif;
-    background: var(--sky-pale);
-    min-height: 100vh;
-    padding: 20px 16px 36px;
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
-  }
-
+  body { font-family: 'Zen Maru Gothic', sans-serif; background: var(--sky-pale); min-height: 100vh; padding: 20px 16px 36px; color: var(--text); -webkit-font-smoothing: antialiased; }
   .widget { max-width: 980px; margin: 0 auto; }
 
-  /* ── Header ── */
-  .header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 18px; padding: 0 2px;
-  }
+  /* Header */
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding: 0 2px; }
   .header-left { display: flex; align-items: center; gap: 10px; }
-  .header-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 18px; color: var(--brown);
-    letter-spacing: -0.01em;
-  }
+  .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--brown); letter-spacing: -0.01em; }
   .header-deco { font-size: 10px; color: var(--brown-light); letter-spacing: 0.2em; }
   .week-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-
   .nav-buttons { display: flex; align-items: center; gap: 4px; }
-  .nav-btn {
-    width: 28px; height: 28px; border: 1.5px solid var(--border);
-    background: var(--white); border-radius: 8px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text-muted); transition: all 0.15s ease;
-  }
+  .nav-btn { width: 28px; height: 28px; border: 1.5px solid var(--border); background: var(--white); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.15s ease; }
   .nav-btn:hover { background: var(--sky-pale); border-color: var(--sky); color: var(--brown); }
   .nav-btn svg { width: 14px; height: 14px; }
-  .today-btn {
-    font-size: 11px; font-weight: 700; padding: 4px 10px;
-    border: 1.5px solid var(--border); background: var(--white);
-    border-radius: 8px; cursor: pointer; color: var(--text-muted);
-    font-family: 'Zen Maru Gothic', sans-serif;
-    transition: all 0.15s ease;
-  }
+  .today-btn { font-size: 11px; font-weight: 700; padding: 4px 10px; border: 1.5px solid var(--border); background: var(--white); border-radius: 8px; cursor: pointer; color: var(--text-muted); font-family: 'Zen Maru Gothic', sans-serif; transition: all 0.15s ease; }
   .today-btn:hover { background: var(--sky-pale); border-color: var(--sky); color: var(--brown); }
 
-  /* ── Grid Layout ── */
-  .row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-bottom: 8px;
-  }
+  /* Loading */
+  .loading-bar { height: 3px; background: var(--sky-light); border-radius: 99px; margin-bottom: 12px; overflow: hidden; opacity: 0; transition: opacity 0.2s; }
+  .loading-bar.visible { opacity: 1; }
+  .loading-bar-fill { height: 100%; background: linear-gradient(90deg, var(--sky), var(--brown-light)); border-radius: 99px; animation: loadingAnim 1.2s ease-in-out infinite; }
+  @keyframes loadingAnim { 0%{width:0%;margin-left:0} 50%{width:70%;margin-left:15%} 100%{width:0%;margin-left:100%} }
 
-  /* ── Day Column ── */
-  .day-col {
-    background: var(--white);
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    display: flex; flex-direction: column;
-    min-height: 240px;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 10px var(--shadow);
-  }
+  /* Grid */
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px; }
+
+  /* Day Column */
+  .day-col { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; min-height: 240px; transition: border-color 0.2s, box-shadow 0.2s; box-shadow: 0 2px 10px var(--shadow); }
   .day-col:hover { border-color: var(--sky); }
-  .day-col.is-today {
-    border-color: var(--sky);
-    box-shadow: 0 2px 14px rgba(168,216,234,0.35);
-    background: linear-gradient(180deg, rgba(168,216,234,0.08) 0%, var(--white) 100%);
-  }
+  .day-col.is-today { border-color: var(--sky); box-shadow: 0 2px 14px rgba(168,216,234,0.35); background: linear-gradient(180deg, rgba(168,216,234,0.08) 0%, var(--white) 100%); }
   .day-col.is-weekend .day-header { background: rgba(242,196,184,0.12); }
   .day-col.is-holiday .day-header { background: rgba(242,196,184,0.12); }
-  .day-col.drag-over {
-    border-color: var(--sky);
-    border-style: dashed;
-    background: var(--drag-highlight);
-  }
+  .day-col.drag-over { border-color: var(--sky); border-style: dashed; background: var(--drag-highlight); }
 
-  .day-header {
-    padding: 10px 10px 8px;
-    text-align: center;
-    border-bottom: 1.5px solid var(--border);
-    background: rgba(255,255,255,0.5);
-    position: relative;
-  }
+  .day-header { padding: 10px 10px 8px; text-align: center; border-bottom: 1.5px solid var(--border); background: rgba(255,255,255,0.5); position: relative; }
   .day-col.is-today .day-header { border-bottom-color: rgba(168,216,234,0.4); }
-
-  .day-name {
-    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
-    color: var(--text-light); margin-bottom: 3px;
-  }
+  .day-name { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-light); margin-bottom: 3px; }
   .day-col.is-today .day-name { color: var(--sky); }
-  .day-col.is-weekend .day-name,
-  .day-col.is-holiday .day-name { color: var(--blush); }
-
-  .day-number {
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px; color: var(--text); line-height: 1;
-  }
+  .day-col.is-weekend .day-name, .day-col.is-holiday .day-name { color: var(--blush); }
+  .day-number { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); line-height: 1; }
   .day-col.is-today .day-number { color: var(--sky); }
-  .day-col.is-weekend .day-number,
-  .day-col.is-holiday .day-number { color: #c4756a; }
+  .day-col.is-weekend .day-number, .day-col.is-holiday .day-number { color: #c4756a; }
+  .holiday-label { font-size: 8.5px; color: #c4756a; margin-top: 2px; font-weight: 500; line-height: 1.2; }
+  .day-dot { position: absolute; top: 8px; right: 8px; width: 6px; height: 6px; border-radius: 50%; background: var(--sky); }
 
-  .holiday-label {
-    font-size: 8.5px; color: #c4756a; margin-top: 2px;
-    font-weight: 500; line-height: 1.2;
-  }
-
-  .day-dot {
-    position: absolute; top: 8px; right: 8px;
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--sky);
-  }
-
-  /* ── Task List ── */
-  .task-list {
-    padding: 6px; flex: 1;
-    display: flex; flex-direction: column; gap: 1px;
-    min-height: 40px;
-  }
-
-  .task-item {
-    display: flex; align-items: flex-start; gap: 5px;
-    padding: 5px 4px; border-radius: 8px;
-    transition: background 0.1s; cursor: default;
-    animation: taskIn 0.2s ease; user-select: none;
-  }
-  @keyframes taskIn {
-    from { opacity: 0; transform: translateY(-3px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  /* Task List */
+  .task-list { padding: 6px; flex: 1; display: flex; flex-direction: column; gap: 1px; min-height: 40px; }
+  .task-item { display: flex; align-items: flex-start; gap: 5px; padding: 5px 4px; border-radius: 8px; transition: background 0.1s; cursor: default; animation: taskIn 0.2s ease; user-select: none; }
+  @keyframes taskIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
   .task-item:hover { background: var(--sky-pale); }
   .task-item.dragging { opacity: 0.3; }
   .task-item.drop-above { box-shadow: 0 -2px 0 0 var(--sky); }
   .task-item.drop-below { box-shadow: 0 2px 0 0 var(--sky); }
   .task-item.from-pool { border-left: 2px solid var(--pool-accent); padding-left: 6px; }
+  .task-item.is-top3 { border-left: 2px solid var(--top3); padding-left: 6px; }
 
-  .drag-handle {
-    width: 12px; min-width: 12px; height: 16px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: grab; color: var(--text-light); opacity: 0;
-    transition: opacity 0.1s; margin-top: 1px;
-  }
-  .drag-handle:active { cursor: grabbing; }
+  .drag-handle { width: 8px; min-width: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-light); cursor: grab; opacity: 0; transition: opacity 0.1s; margin-top: 3px; }
   .task-item:hover .drag-handle { opacity: 0.6; }
   .drag-handle svg { width: 8px; height: 12px; }
 
-  .task-cb {
-    width: 15px; height: 15px; min-width: 15px;
-    border: 1.5px solid var(--text-light); border-radius: 4px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s cubic-bezier(0.34,1.56,0.64,1);
-    margin-top: 1px; background: var(--white);
-    flex-shrink: 0;
-  }
+  .task-cb { width: 14px; height: 14px; min-width: 14px; border-radius: 4px; border: 1.5px solid var(--border); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; margin-top: 3px; }
   .task-cb:hover { border-color: var(--sky); background: var(--sky-pale); }
-  .task-cb.checked {
-    background: var(--sky); border-color: var(--sky);
-    transform: scale(1.1);
-  }
+  .task-cb.checked { background: var(--sky); border-color: var(--sky); }
   .task-cb.checked svg { opacity: 1; }
   .task-cb svg { width: 9px; height: 9px; opacity: 0; color: white; transition: opacity 0.15s; }
 
-  .task-text {
-    font-size: 11.5px; line-height: 1.5; color: var(--text);
-    flex: 1; word-break: break-word; outline: none;
-  }
+  .task-text { font-size: 12px; line-height: 1.5; color: var(--text); flex: 1; word-break: break-word; outline: none; min-height: 18px; }
   .task-text.done { text-decoration: line-through; color: var(--text-light); }
 
-  .task-del {
-    width: 16px; height: 16px; min-width: 16px; border: none;
-    background: transparent; cursor: pointer; border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; transition: all 0.1s; color: var(--text-light); margin-top: 1px;
-  }
+  /* Top3 toggle button */
+  .task-top3-btn { width: 16px; height: 16px; min-width: 16px; border: none; background: transparent; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.1s; color: var(--text-light); margin-top: 1px; }
+  .task-item:hover .task-top3-btn { opacity: 1; }
+  .task-top3-btn.active { opacity: 1 !important; color: var(--top3); }
+  .task-top3-btn:hover { background: rgba(196,126,192,0.15); color: var(--top3); }
+  .task-top3-btn svg { width: 10px; height: 10px; }
+
+  .task-del { width: 16px; height: 16px; min-width: 16px; border: none; background: transparent; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.1s; color: var(--text-light); margin-top: 1px; }
   .task-item:hover .task-del { opacity: 1; }
   .task-del:hover { background: rgba(242,196,184,0.4); color: #c4756a; }
   .task-del svg { width: 10px; height: 10px; }
 
-  .add-task-btn {
-    display: flex; align-items: center; gap: 5px;
-    padding: 5px 6px; border: none; background: transparent;
-    cursor: pointer; border-radius: 8px; color: var(--text-light);
-    font-size: 11px; font-family: 'Zen Maru Gothic', sans-serif;
-    transition: all 0.15s; width: 100%; text-align: left; margin-top: 2px;
-  }
+  .add-task-btn { display: flex; align-items: center; gap: 5px; padding: 5px 8px; border: none; background: transparent; cursor: pointer; border-radius: 8px; color: var(--text-light); font-size: 11px; font-family: 'Zen Maru Gothic', sans-serif; transition: all 0.15s; width: 100%; text-align: left; }
   .add-task-btn:hover { background: var(--sky-pale); color: var(--brown); }
   .add-task-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
 
-  /* ── Pool Column ── */
-  .pool-col {
-    background: var(--white);
-    border: 1.5px solid rgba(196,168,130,0.3);
-    border-radius: var(--radius);
-    overflow: hidden;
-    display: flex; flex-direction: column;
-    min-height: 240px;
-    box-shadow: 0 2px 10px var(--shadow);
-    transition: border-color 0.2s;
-  }
-  .pool-col.drag-over {
-    border-color: var(--pool-accent);
-    border-style: dashed;
-    background: var(--pool-soft);
-  }
-
-  .pool-header {
-    padding: 10px 12px 8px;
-    border-bottom: 1.5px solid rgba(196,168,130,0.2);
-    background: rgba(245,237,230,0.5);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .pool-title {
-    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
-    color: var(--pool-accent); display: flex; align-items: center; gap: 4px;
-  }
+  /* Pool */
+  .pool-col { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); display: flex; flex-direction: column; min-height: 240px; box-shadow: 0 2px 10px var(--shadow); transition: border-color 0.2s; }
+  .pool-col.drag-over { border-color: var(--pool-accent); border-style: dashed; background: var(--pool-soft); }
+  .pool-header { padding: 10px 10px 8px; border-bottom: 1.5px solid rgba(196,168,130,0.2); display: flex; align-items: center; justify-content: space-between; }
+  .pool-title { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: var(--pool-accent); display: flex; align-items: center; gap: 4px; }
   .pool-title-icon { font-size: 11px; }
-  .pool-count {
-    font-size: 10px; font-weight: 700;
-    background: var(--brown-pale); color: var(--pool-accent);
-    padding: 2px 7px; border-radius: 99px;
-  }
-
+  .pool-count { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 99px; background: var(--brown-pale); color: var(--pool-accent); }
   .pool-list { padding: 6px; flex: 1; display: flex; flex-direction: column; gap: 1px; }
-
-  .pool-item {
-    display: flex; align-items: flex-start; gap: 5px;
-    padding: 5px 4px; border-radius: 8px;
-    cursor: grab; transition: background 0.1s;
-    animation: taskIn 0.2s ease; user-select: none;
-    border-left: 2px solid transparent;
-  }
+  .pool-item { display: flex; align-items: flex-start; gap: 5px; padding: 5px 4px; border-radius: 8px; border-left: 2px solid transparent; transition: all 0.1s; animation: taskIn 0.2s ease; user-select: none; cursor: default; }
   .pool-item:hover { background: var(--brown-pale); border-left-color: var(--pool-accent); }
-  .pool-item:active { cursor: grabbing; }
   .pool-item.dragging { opacity: 0.3; }
   .pool-item.drop-above { box-shadow: 0 -2px 0 0 var(--pool-accent); }
   .pool-item.drop-below { box-shadow: 0 2px 0 0 var(--pool-accent); }
-
-  .pool-handle {
-    width: 12px; min-width: 12px; height: 16px;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text-light); opacity: 0;
-    transition: opacity 0.1s; margin-top: 1px;
-  }
+  .pool-handle { width: 8px; min-width: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-light); cursor: grab; opacity: 0; transition: opacity 0.1s; margin-top: 3px; }
   .pool-item:hover .pool-handle { opacity: 0.6; }
   .pool-handle svg { width: 8px; height: 12px; }
-
-  .pool-text {
-    font-size: 11.5px; line-height: 1.5; color: var(--text);
-    flex: 1; word-break: break-word; outline: none;
-  }
-
-  .pool-del {
-    width: 16px; height: 16px; min-width: 16px; border: none;
-    background: transparent; cursor: pointer; border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; transition: all 0.1s; color: var(--text-light); margin-top: 1px;
-  }
+  .pool-text { font-size: 11.5px; line-height: 1.5; color: var(--text); flex: 1; word-break: break-word; outline: none; }
+  .pool-del { width: 16px; height: 16px; min-width: 16px; border: none; background: transparent; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: all 0.1s; color: var(--text-light); margin-top: 1px; }
   .pool-item:hover .pool-del { opacity: 1; }
   .pool-del:hover { background: rgba(242,196,184,0.4); color: #c4756a; }
   .pool-del svg { width: 10px; height: 10px; }
-
-  .pool-add-btn {
-    display: flex; align-items: center; gap: 5px;
-    padding: 5px 6px; border: none; background: transparent;
-    cursor: pointer; border-radius: 8px; color: var(--pool-accent);
-    font-size: 11px; font-family: 'Zen Maru Gothic', sans-serif;
-    transition: all 0.15s; width: 100%; text-align: left; margin: 2px 0 0;
-  }
+  .pool-add-btn { display: flex; align-items: center; gap: 5px; padding: 5px 6px; border: none; background: transparent; cursor: pointer; border-radius: 8px; color: var(--pool-accent); font-size: 11px; font-family: 'Zen Maru Gothic', sans-serif; transition: all 0.15s; width: 100%; text-align: left; margin: 2px 0 0; }
   .pool-add-btn:hover { background: var(--brown-pale); }
   .pool-add-btn svg { width: 12px; height: 12px; flex-shrink: 0; }
+  .pool-hint { padding: 6px 8px 8px; font-size: 9.5px; color: var(--text-light); text-align: center; line-height: 1.5; border-top: 1px solid rgba(196,168,130,0.15); margin-top: auto; }
 
-  .pool-hint {
-    padding: 6px 8px 8px;
-    font-size: 9.5px; color: var(--text-light);
-    text-align: center; line-height: 1.5;
-    border-top: 1px solid rgba(196,168,130,0.15);
-    margin-top: auto;
-  }
-
-  /* ── Footer ── */
-  .footer {
-    display: flex; align-items: center; gap: 12px;
-    margin-top: 10px; padding: 0 2px;
-  }
-  .progress-bg {
-    flex: 1; height: 6px; background: rgba(168,216,234,0.25);
-    border-radius: 99px; overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--sky) 0%, var(--brown-light) 100%);
-    border-radius: 99px;
-    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
-  }
+  /* Footer */
+  .footer { display: flex; align-items: center; gap: 12px; margin-top: 10px; padding: 0 2px; }
+  .progress-bg { flex: 1; height: 6px; background: rgba(168,216,234,0.25); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--sky) 0%, var(--brown-light) 100%); border-radius: 99px; transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
   .progress-text { font-size: 10.5px; color: var(--text-muted); font-weight: 500; white-space: nowrap; }
 
-  /* ── Scrollbar ── */
-  ::-webkit-scrollbar { width: 10px; }
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: var(--sky-pale); border-radius: 99px; }
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--sky) 0%, var(--brown-light) 100%);
-    border-radius: 99px; border: 2px solid var(--sky-pale);
-  }
-  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #7ec8e0 0%, #b8926a 100%); }
-  html { scrollbar-width: auto; scrollbar-color: var(--sky) var(--sky-pale); }
+  ::-webkit-scrollbar-thumb { background: var(--sky); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #8ecde5; }
+  * { scrollbar-width: thin; scrollbar-color: var(--sky) var(--sky-pale); }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--brown); color: white; font-size: 12px; font-weight: 500; padding: 8px 18px; border-radius: 99px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); opacity: 0; transition: all 0.3s ease; pointer-events: none; z-index: 9999; font-family: 'Zen Maru Gothic', sans-serif; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
@@ -349,158 +157,240 @@
     </div>
     <div class="nav-buttons">
       <button class="today-btn" onclick="goToday()">Today</button>
-      <button class="nav-btn" onclick="navigate(-1)" title="前の週">
+      <button class="nav-btn" onclick="navigate(-1)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
-      <button class="nav-btn" onclick="navigate(1)" title="次の週">
+      <button class="nav-btn" onclick="navigate(1)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>
   </div>
 
-  <!-- Row 1: Mon–Thu -->
+  <div class="loading-bar" id="loadingBar"><div class="loading-bar-fill"></div></div>
+
   <div class="row" id="rowTop"></div>
-  <!-- Row 2: Fri–Sun + Pool -->
   <div class="row" id="rowBottom"></div>
 
   <div class="footer">
     <div class="progress-bg"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-    <div class="progress-text" id="progressText">No tasks yet</div>
+    <div class="progress-text" id="progressText">読み込み中...</div>
   </div>
 </div>
+<div class="toast" id="toast"></div>
 
 <script>
+// ── Supabase ──
+const SUPABASE_URL = 'https://nbduyknklcwqbinvhoih.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iZHV5a25rbGN3cWJpbnZob2loIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NjMzNjUsImV4cCI6MjA4NzIzOTM2NX0.kzZYqBwfc8vpGszN2W3so2jURsZXlrve4KvUydYKIfA';
+
+async function sbFetch(path, options = {}) {
+  const { headers: extraHeaders, ...rest } = options;
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...rest,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      ...(extraHeaders || {})
+    }
+  });
+  if (res.status === 204) return null;
+  if (!res.ok) throw new Error(await res.text());
+  const t = await res.text();
+  return t ? JSON.parse(t) : null;
+}
+
+// ── Constants ──
 const DAY_NAMES_JP = ['日','月','火','水','木','金','土'];
 const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-// ── Japanese Holidays ──
+// ── Holidays ──
+const holidayCache = {};
 function nthWeekday(year, month, weekday, n) {
-  const first = new Date(year, month - 1, 1);
+  const first = new Date(year, month-1, 1);
   let d = ((weekday - first.getDay()) + 7) % 7 + 1;
-  d += (n - 1) * 7;
-  return new Date(year, month - 1, d);
+  d += (n-1) * 7;
+  return d;
 }
-function vernalEquinox(y) {
-  if (y <= 1947) return null;
-  let d;
-  if (y <= 1979) d = Math.floor(20.8357 + 0.242194*(y-1980) - Math.floor((y-1983)/4));
-  else if (y <= 2099) d = Math.floor(20.8431 + 0.242194*(y-1980) - Math.floor((y-1980)/4));
-  else d = Math.floor(21.851 + 0.242194*(y-1980) - Math.floor((y-1980)/4));
-  return new Date(y, 2, d);
-}
-function autumnalEquinox(y) {
-  if (y <= 1947) return null;
-  let d;
-  if (y <= 1979) d = Math.floor(23.2588 + 0.242194*(y-1980) - Math.floor((y-1983)/4));
-  else if (y <= 2099) d = Math.floor(23.2488 + 0.242194*(y-1980) - Math.floor((y-1980)/4));
-  else d = Math.floor(24.2488 + 0.242194*(y-1980) - Math.floor((y-1980)/4));
-  return new Date(y, 8, d);
-}
+function vernalEquinox(y) { return Math.floor(20.8431 + 0.242194*(y-1980) - Math.floor((y-1980)/4)); }
+function autumnalEquinox(y) { return Math.floor(23.2488 + 0.242194*(y-1980) - Math.floor((y-1980)/4)); }
 function getJapaneseHolidays(year) {
   const holidays = {};
   const addH = (m,d,name) => { holidays[`${year}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`] = name; };
-  addH(1,1,'元日'); addH(2,11,'建国記念の日'); addH(2,23,'天皇誕生日');
-  addH(4,29,'昭和の日'); addH(5,3,'憲法記念日'); addH(5,4,'みどりの日'); addH(5,5,'こどもの日');
-  addH(8,11,'山の日'); addH(11,3,'文化の日'); addH(11,23,'勤労感謝の日');
-  const seijin = nthWeekday(year,1,1,2); addH(1,seijin.getDate(),'成人の日');
-  const umi = nthWeekday(year,7,1,3); addH(7,umi.getDate(),'海の日');
-  const keirou = nthWeekday(year,9,1,3); addH(9,keirou.getDate(),'敬老の日');
-  const taiiku = nthWeekday(year,10,1,2); addH(10,taiiku.getDate(),'スポーツの日');
-  const ve = vernalEquinox(year); if(ve) addH(3,ve.getDate(),'春分の日');
-  const ae = autumnalEquinox(year); if(ae) addH(9,ae.getDate(),'秋分の日');
+  addH(1,1,'元日'); addH(1,nthWeekday(year,1,1,2),'成人の日');
+  addH(2,11,'建国記念の日'); addH(2,23,'天皇誕生日');
+  addH(3,vernalEquinox(year),'春分の日');
+  addH(4,29,'昭和の日');
+  addH(5,3,'憲法記念日'); addH(5,4,'みどりの日'); addH(5,5,'こどもの日');
+  addH(7,nthWeekday(year,7,1,3),'海の日'); addH(8,11,'山の日');
+  addH(9,nthWeekday(year,9,1,3),'敬老の日'); addH(9,autumnalEquinox(year),'秋分の日');
+  addH(10,nthWeekday(year,10,1,2),'スポーツの日');
+  addH(11,3,'文化の日'); addH(11,23,'勤労感謝の日');
   const baseKeys = Object.keys(holidays);
-  for(const key of baseKeys) {
-    const d = new Date(key+'T00:00:00');
-    if(d.getDay()===0) {
-      let next=new Date(d); next.setDate(next.getDate()+1);
-      let nk=dateKey(next);
-      while(holidays[nk]){ next.setDate(next.getDate()+1); nk=dateKey(next); }
-      holidays[nk]='振替休日';
+  for (const key of baseKeys) {
+    const d = new Date(key); if (d.getDay() === 0) {
+      const next = new Date(d); next.setDate(next.getDate()+1);
+      const nk = dateKey(next);
+      while(holidays[nk]){ next.setDate(next.getDate()+1); }
+      holidays[dateKey(next)] = '振替休日';
     }
   }
-  for(const key of Object.keys(holidays)) {
-    const d=new Date(key+'T00:00:00'); const n2=new Date(d); n2.setDate(n2.getDate()+2);
-    if(holidays[dateKey(n2)]) {
-      const mid=new Date(d); mid.setDate(mid.getDate()+1); const mk=dateKey(mid);
-      if(!holidays[mk]&&mid.getDay()!==0&&mid.getDay()!==6) holidays[mk]='国民の休日';
+  for (const key of Object.keys(holidays)) {
+    const d1 = new Date(key); const d2 = new Date(key); d2.setDate(d2.getDate()+2);
+    if (holidays[dateKey(d2)]) {
+      const mid = new Date(d1); mid.setDate(mid.getDate()+1);
+      const mk = dateKey(mid);
+      if (!holidays[mk] && mid.getDay()!==0 && mid.getDay()!==6) holidays[mk] = '国民の休日';
     }
   }
   return holidays;
 }
-const holidayCache = {};
 function getHoliday(d) {
-  const y=d.getFullYear();
-  if(!holidayCache[y]) holidayCache[y]=getJapaneseHolidays(y);
-  return holidayCache[y][dateKey(d)]||null;
+  const y = d.getFullYear();
+  if (!holidayCache[y]) holidayCache[y] = getJapaneseHolidays(y);
+  return holidayCache[y][dateKey(d)] || null;
 }
 
 // ── State ──
 let currentWeekStart = getMonday(new Date());
-let weekTasks = loadData('cute_week_tasks', {});
-let poolTasks = loadData('cute_pool_tasks', []);   // ← pool はリセットなし
+let weekTasks = {};   // { dateKey: [task, ...] }
+let poolTasks = [];
 let dragState = null;
+let saving = false;
 
 function getMonday(d) {
-  const date=new Date(d); const day=date.getDay();
-  date.setDate(date.getDate()-day+(day===0?-6:1)); date.setHours(0,0,0,0);
+  const date = new Date(d); const day = date.getDay();
+  date.setDate(date.getDate() - day + (day===0 ? -6 : 1)); date.setHours(0,0,0,0);
   return date;
 }
 function dateKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
-function loadData(key, fallback) {
-  try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch { return fallback; }
-}
-function saveWeek() { localStorage.setItem('cute_week_tasks', JSON.stringify(weekTasks)); }
-function savePool() { localStorage.setItem('cute_pool_tasks', JSON.stringify(poolTasks)); }
-function navigate(dir) {
-  currentWeekStart=new Date(currentWeekStart);
-  currentWeekStart.setDate(currentWeekStart.getDate()+dir*7);
-  render();
-}
-function goToday() { currentWeekStart=getMonday(new Date()); render(); }
 function isToday(d) {
-  const t=new Date();
-  return d.getFullYear()===t.getFullYear()&&d.getMonth()===t.getMonth()&&d.getDate()===t.getDate();
+  const t = new Date();
+  return d.getFullYear()===t.getFullYear() && d.getMonth()===t.getMonth() && d.getDate()===t.getDate();
 }
-function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function setLoading(v) { document.getElementById('loadingBar').classList.toggle('visible', v); }
 
-// ── Week Task Actions ──
-function toggleTask(key,idx) {
-  if(weekTasks[key]?.[idx]) { weekTasks[key][idx].done=!weekTasks[key][idx].done; saveWeek(); render(); }
-}
-function deleteTask(key,idx) {
-  if(weekTasks[key]) {
-    weekTasks[key].splice(idx,1);
-    if(!weekTasks[key].length) delete weekTasks[key];
-    saveWeek(); render();
+// ── Load from Supabase ──
+async function loadWeek() {
+  setLoading(true);
+  try {
+    const weekEnd = new Date(currentWeekStart); weekEnd.setDate(weekEnd.getDate()+6);
+    const rows = await sbFetch(
+      `week_tasks?select=*&date=gte.${dateKey(currentWeekStart)}&date=lte.${dateKey(weekEnd)}&order=sort_order.asc`
+    );
+    weekTasks = {};
+    (rows || []).forEach(r => {
+      if (!weekTasks[r.date]) weekTasks[r.date] = [];
+      weekTasks[r.date].push({ id: r.id, text: r.text, done: r.done, fromPool: r.from_pool, top3: r.top3 });
+    });
+    const pool = await sbFetch('pool_tasks?select=*&order=sort_order.asc');
+    poolTasks = (pool || []).map(r => ({ id: r.id, text: r.text }));
+    render();
+  } catch(e) {
+    showToast('読み込みエラー: ' + e.message);
+  } finally {
+    setLoading(false);
   }
 }
-function addTask(key) {
-  if(!weekTasks[key]) weekTasks[key]=[];
-  const id=uid(); weekTasks[key].push({id, text:'', done:false});
-  saveWeek(); render();
-  setTimeout(()=>{ const el=document.querySelector(`[data-tid="${id}"] .task-text`); if(el) el.focus(); }, 50);
+
+// ── Save helpers ──
+async function saveTask(task, dateK) {
+  try {
+    await sbFetch('week_tasks', {
+      method: 'POST',
+      headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({ id: task.id, date: dateK, text: task.text, done: task.done, from_pool: task.fromPool||false, top3: task.top3||false, sort_order: 0 })
+    });
+  } catch(e) { showToast('保存エラー'); }
 }
-function updateTaskText(key,idx,text) {
-  if(weekTasks[key]?.[idx]) { weekTasks[key][idx].text=text; saveWeek(); }
+async function deleteTaskDB(id) {
+  try { await sbFetch(`week_tasks?id=eq.${id}`, { method: 'DELETE' }); } catch(e) { showToast('削除エラー'); }
 }
-function taskKeydown(e,key,idx) {
-  if(e.key==='Enter') { e.preventDefault(); addTask(key); }
-  if(e.key==='Backspace'&&weekTasks[key][idx].text==='') { e.preventDefault(); deleteTask(key,idx); }
+async function savePoolTask(task) {
+  try {
+    await sbFetch('pool_tasks', {
+      method: 'POST',
+      headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({ id: task.id, text: task.text, sort_order: 0 })
+    });
+  } catch(e) { showToast('保存エラー'); }
+}
+async function deletePoolTaskDB(id) {
+  try { await sbFetch(`pool_tasks?id=eq.${id}`, { method: 'DELETE' }); } catch(e) { showToast('削除エラー'); }
+}
+
+// ── Week Task Actions ──
+async function toggleTask(key, idx) {
+  if (!weekTasks[key]?.[idx]) return;
+  weekTasks[key][idx].done = !weekTasks[key][idx].done;
+  render();
+  await saveTask(weekTasks[key][idx], key);
+}
+async function deleteTask(key, idx) {
+  if (!weekTasks[key]) return;
+  const task = weekTasks[key][idx];
+  weekTasks[key].splice(idx, 1);
+  if (!weekTasks[key].length) delete weekTasks[key];
+  render();
+  await deleteTaskDB(task.id);
+}
+async function addTask(key) {
+  if (!weekTasks[key]) weekTasks[key] = [];
+  const task = { id: uid(), text: '', done: false, fromPool: false, top3: false };
+  weekTasks[key].push(task);
+  render();
+  setTimeout(() => { const el = document.querySelector(`[data-tid="${task.id}"] .task-text`); if(el) el.focus(); }, 50);
+  await saveTask(task, key);
+}
+async function updateTaskText(key, idx, text) {
+  if (!weekTasks[key]?.[idx]) return;
+  weekTasks[key][idx].text = text;
+  await saveTask(weekTasks[key][idx], key);
+}
+function taskKeydown(e, key, idx) {
+  if (e.key==='Enter') { e.preventDefault(); addTask(key); }
+  if (e.key==='Backspace' && weekTasks[key][idx].text==='') { e.preventDefault(); deleteTask(key, idx); }
+}
+async function toggleTop3(key, idx) {
+  if (!weekTasks[key]?.[idx]) return;
+  const task = weekTasks[key][idx];
+  // 今日のタスクのみtop3設定可能
+  const todayK = dateKey(new Date());
+  if (key !== todayK) { showToast('今日のタスクのみトップ3に設定できます'); return; }
+  // top3は最大3つ
+  const currentTop3 = (weekTasks[key] || []).filter(t => t.top3 && t.id !== task.id).length;
+  if (!task.top3 && currentTop3 >= 3) { showToast('トップ3はすでに3つ設定されています'); return; }
+  task.top3 = !task.top3;
+  render();
+  await saveTask(task, key);
+  showToast(task.top3 ? 'トップ3に追加しました ✦' : 'トップ3から外しました');
 }
 
 // ── Pool Actions ──
-function addPoolTask() {
-  const id=uid(); poolTasks.push({id, text:''});
-  savePool(); render();
-  setTimeout(()=>{ const el=document.querySelector(`[data-pid="${id}"] .pool-text`); if(el) el.focus(); }, 50);
+async function addPoolTask() {
+  const task = { id: uid(), text: '' };
+  poolTasks.push(task);
+  render();
+  setTimeout(() => { const el = document.querySelector(`[data-pid="${task.id}"] .pool-text`); if(el) el.focus(); }, 50);
+  await savePoolTask(task);
 }
-function updatePoolText(idx,text) { if(poolTasks[idx]) { poolTasks[idx].text=text; savePool(); } }
-function deletePoolTask(idx) { poolTasks.splice(idx,1); savePool(); render(); }
-function poolKeydown(e,idx) {
-  if(e.key==='Enter') { e.preventDefault(); addPoolTask(); }
-  if(e.key==='Backspace'&&poolTasks[idx].text==='') { e.preventDefault(); deletePoolTask(idx); }
+async function updatePoolText(idx, text) {
+  if (!poolTasks[idx]) return;
+  poolTasks[idx].text = text;
+  await savePoolTask(poolTasks[idx]);
+}
+async function deletePoolTask(idx) {
+  const task = poolTasks[idx];
+  poolTasks.splice(idx, 1);
+  render();
+  await deletePoolTaskDB(task.id);
+}
+function poolKeydown(e, idx) {
+  if (e.key==='Enter') { e.preventDefault(); addPoolTask(); }
+  if (e.key==='Backspace' && poolTasks[idx].text==='') { e.preventDefault(); deletePoolTask(idx); }
 }
 
 // ── Drag & Drop ──
@@ -515,121 +405,132 @@ function onPoolDragStart(e, idx) {
   requestAnimationFrame(()=>{ e.target.closest('.pool-item')?.classList.add('dragging'); });
 }
 function onDragEnd() {
-  dragState=null;
+  dragState = null;
   document.querySelectorAll('.dragging,.drag-over,.drop-above,.drop-below')
     .forEach(el=>el.classList.remove('dragging','drag-over','drop-above','drop-below'));
 }
-
-// Drop on day column
 function onColDragOver(e) {
   e.preventDefault(); e.dataTransfer.dropEffect='move';
-  const col=e.target.closest('.day-col');
-  if(col){
-    document.querySelectorAll('.day-col.drag-over').forEach(el=>{ if(el!==col)el.classList.remove('drag-over'); });
-    col.classList.add('drag-over');
-  }
+  const col = e.target.closest('.day-col');
+  if (col) { document.querySelectorAll('.day-col.drag-over').forEach(el=>{ if(el!==col)el.classList.remove('drag-over'); }); col.classList.add('drag-over'); }
   document.querySelectorAll('.drop-above,.drop-below').forEach(el=>el.classList.remove('drop-above','drop-below'));
-  const ti=e.target.closest('.task-item');
-  if(ti){ const r=ti.getBoundingClientRect(); ti.classList.add(e.clientY<r.top+r.height/2?'drop-above':'drop-below'); }
+  const ti = e.target.closest('.task-item');
+  if (ti) { const r = ti.getBoundingClientRect(); ti.classList.add(e.clientY<r.top+r.height/2?'drop-above':'drop-below'); }
 }
 function onColDragLeave(e) {
-  const col=e.target.closest('.day-col');
-  if(col&&!col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+  const col = e.target.closest('.day-col');
+  if (col && !col.contains(e.relatedTarget)) col.classList.remove('drag-over');
 }
-function onColDrop(e, targetKey) {
+async function onColDrop(e, targetKey) {
   e.preventDefault();
-  if(!dragState) return;
-  const {source, key:srcKey, idx, data} = dragState;
+  if (!dragState) return;
+  const { source, key:srcKey, idx, data } = dragState;
+  let dropIdx = (weekTasks[targetKey]||[]).length;
+  const ti = e.target.closest('.task-item');
+  if (ti) { const i = parseInt(ti.dataset.idx,10); const r = ti.getBoundingClientRect(); dropIdx = e.clientY<r.top+r.height/2?i:i+1; }
 
-  let dropIdx=(weekTasks[targetKey]||[]).length;
-  const ti=e.target.closest('.task-item');
-  if(ti){ const i=parseInt(ti.dataset.idx,10); const r=ti.getBoundingClientRect(); dropIdx=e.clientY<r.top+r.height/2?i:i+1; }
+  const newTask = { id: uid(), text: data.text, done: data.done||false, fromPool: source==='pool', top3: false };
 
-  // Remove from source
-  if(source==='pool') { poolTasks.splice(idx,1); savePool(); }
-  else if(source==='week') {
-    if(weekTasks[srcKey]){ weekTasks[srcKey].splice(idx,1); if(!weekTasks[srcKey].length) delete weekTasks[srcKey]; }
-    if(srcKey===targetKey && idx<dropIdx) dropIdx--;
+  if (source==='pool') {
+    const poolTask = poolTasks[idx];
+    poolTasks.splice(idx, 1);
+    await deletePoolTaskDB(poolTask.id);
+  } else if (source==='week') {
+    const oldTask = weekTasks[srcKey][idx];
+    weekTasks[srcKey].splice(idx, 1);
+    if (!weekTasks[srcKey].length) delete weekTasks[srcKey];
+    await deleteTaskDB(oldTask.id);
+    if (srcKey===targetKey && idx<dropIdx) dropIdx--;
   }
 
-  if(!weekTasks[targetKey]) weekTasks[targetKey]=[];
-  weekTasks[targetKey].splice(dropIdx, 0, {id:uid(), text:data.text, done:data.done||false, fromPool:source==='pool'});
-  saveWeek(); dragState=null; render();
+  if (!weekTasks[targetKey]) weekTasks[targetKey] = [];
+  weekTasks[targetKey].splice(dropIdx, 0, newTask);
+  dragState = null;
+  render();
+  await saveTask(newTask, targetKey);
 }
-
-// Drop on pool
 function onPoolColDragOver(e) {
   e.preventDefault(); e.dataTransfer.dropEffect='move';
-  const col=e.target.closest('.pool-col');
-  if(col) col.classList.add('drag-over');
+  const col = e.target.closest('.pool-col'); if(col) col.classList.add('drag-over');
   document.querySelectorAll('.drop-above,.drop-below').forEach(el=>el.classList.remove('drop-above','drop-below'));
-  const pi=e.target.closest('.pool-item');
-  if(pi){ const r=pi.getBoundingClientRect(); pi.classList.add(e.clientY<r.top+r.height/2?'drop-above':'drop-below'); }
+  const pi = e.target.closest('.pool-item');
+  if (pi) { const r = pi.getBoundingClientRect(); pi.classList.add(e.clientY<r.top+r.height/2?'drop-above':'drop-below'); }
 }
 function onPoolColDragLeave(e) {
-  const col=e.target.closest('.pool-col');
-  if(col&&!col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+  const col = e.target.closest('.pool-col');
+  if (col && !col.contains(e.relatedTarget)) col.classList.remove('drag-over');
 }
-function onPoolColDrop(e) {
+async function onPoolColDrop(e) {
   e.preventDefault();
   document.querySelectorAll('.pool-col.drag-over').forEach(el=>el.classList.remove('drag-over'));
-  if(!dragState) return;
-  const {source, key:srcKey, idx, data} = dragState;
+  if (!dragState) return;
+  const { source, key:srcKey, idx, data } = dragState;
+  let dropIdx = poolTasks.length;
+  const pi = e.target.closest('.pool-item');
+  if (pi) { const ti = parseInt(pi.dataset.pidx,10); const r = pi.getBoundingClientRect(); dropIdx = e.clientY<r.top+r.height/2?ti:ti+1; }
 
-  let dropIdx=poolTasks.length;
-  const pi=e.target.closest('.pool-item');
-  if(pi){ const ti=parseInt(pi.dataset.pidx,10); const r=pi.getBoundingClientRect(); dropIdx=e.clientY<r.top+r.height/2?ti:ti+1; }
-
-  if(source==='pool') { poolTasks.splice(idx,1); if(idx<dropIdx) dropIdx--; }
-  else if(source==='week') {
-    if(weekTasks[srcKey]){ weekTasks[srcKey].splice(idx,1); if(!weekTasks[srcKey].length) delete weekTasks[srcKey]; saveWeek(); }
+  const newTask = { id: uid(), text: data.text };
+  if (source==='pool') {
+    const old = poolTasks[idx];
+    poolTasks.splice(idx, 1);
+    await deletePoolTaskDB(old.id);
+    if (idx<dropIdx) dropIdx--;
+  } else if (source==='week') {
+    const old = weekTasks[srcKey][idx];
+    weekTasks[srcKey].splice(idx, 1);
+    if (!weekTasks[srcKey].length) delete weekTasks[srcKey];
+    await deleteTaskDB(old.id);
   }
-  poolTasks.splice(dropIdx, 0, {id:uid(), text:data.text});
-  savePool(); dragState=null; render();
+  poolTasks.splice(dropIdx, 0, newTask);
+  dragState = null;
+  render();
+  await savePoolTask(newTask);
 }
 
-// ── Render helpers ──
+// ── Render ──
 function renderDayCol(d, key) {
   const dayTasks = weekTasks[key] || [];
   const todayFlag = isToday(d);
-  const isWeekend = d.getDay()===0||d.getDay()===6;
+  const isWeekend = d.getDay()===0 || d.getDay()===6;
   const holiday = getHoliday(d);
+  const todayK = dateKey(new Date());
+  const isCurrentDay = key === todayK;
 
   let cls = 'day-col';
-  if(todayFlag) cls+=' is-today';
-  if(isWeekend) cls+=' is-weekend';
-  if(holiday) cls+=' is-holiday';
+  if (todayFlag) cls += ' is-today';
+  if (isWeekend) cls += ' is-weekend';
+  if (holiday) cls += ' is-holiday';
 
   let tasksHtml = '';
-  dayTasks.forEach((task,idx)=>{
-    tasksHtml += `<div class="task-item${task.fromPool?' from-pool':''}" draggable="true"
-      data-tid="${task.id}" data-idx="${idx}"
-      ondragstart="onTaskDragStart(event,'${key}',${idx})"
-      ondragend="onDragEnd()">
-      <div class="drag-handle">
-        <svg viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="1.5" r="1"/><circle cx="6" cy="1.5" r="1"/><circle cx="2" cy="6" r="1"/><circle cx="6" cy="6" r="1"/><circle cx="2" cy="10.5" r="1"/><circle cx="6" cy="10.5" r="1"/></svg>
-      </div>
+  dayTasks.forEach((task, idx) => {
+    let taskCls = 'task-item';
+    if (task.fromPool) taskCls += ' from-pool';
+    if (task.top3) taskCls += ' is-top3';
+
+    tasksHtml += `<div class="${taskCls}" draggable="true" data-tid="${task.id}" data-idx="${idx}"
+      ondragstart="onTaskDragStart(event,'${key}',${idx})" ondragend="onDragEnd()">
+      <div class="drag-handle"><svg viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="1.5" r="1"/><circle cx="6" cy="1.5" r="1"/><circle cx="2" cy="6" r="1"/><circle cx="6" cy="6" r="1"/><circle cx="2" cy="10.5" r="1"/><circle cx="6" cy="10.5" r="1"/></svg></div>
       <div class="task-cb ${task.done?'checked':''}" onclick="toggleTask('${key}',${idx})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
       </div>
       <div class="task-text ${task.done?'done':''}" contenteditable="true"
         oninput="updateTaskText('${key}',${idx},this.textContent)"
         onkeydown="taskKeydown(event,'${key}',${idx})">${task.text}</div>
+      ${isCurrentDay ? `<button class="task-top3-btn ${task.top3?'active':''}" onclick="toggleTop3('${key}',${idx})" title="${task.top3?'トップ3から外す':'トップ3に追加'}">
+        <svg viewBox="0 0 24 24" fill="${task.top3?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </button>` : ''}
       <button class="task-del" onclick="deleteTask('${key}',${idx})">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </div>`;
   });
 
-  return `<div class="${cls}"
-    ondragover="onColDragOver(event)"
-    ondragleave="onColDragLeave(event)"
-    ondrop="onColDrop(event,'${key}')">
+  return `<div class="${cls}" ondragover="onColDragOver(event)" ondragleave="onColDragLeave(event)" ondrop="onColDrop(event,'${key}')">
     <div class="day-header">
       <div class="day-name">${DAY_NAMES_JP[d.getDay()]}</div>
       <div class="day-number">${d.getDate()}</div>
-      ${holiday?`<div class="holiday-label">${holiday}</div>`:''}
-      ${todayFlag?'<div class="day-dot"></div>':''}
+      ${holiday ? `<div class="holiday-label">${holiday}</div>` : ''}
+      ${todayFlag ? '<div class="day-dot"></div>' : ''}
     </div>
     <div class="task-list">${tasksHtml}</div>
     <button class="add-task-btn" onclick="addTask('${key}')">
@@ -641,14 +542,10 @@ function renderDayCol(d, key) {
 
 function renderPoolCol() {
   let itemsHtml = '';
-  poolTasks.forEach((task,idx)=>{
-    itemsHtml += `<div class="pool-item" draggable="true"
-      data-pid="${task.id}" data-pidx="${idx}"
-      ondragstart="onPoolDragStart(event,${idx})"
-      ondragend="onDragEnd()">
-      <div class="pool-handle">
-        <svg viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="1.5" r="1"/><circle cx="6" cy="1.5" r="1"/><circle cx="2" cy="6" r="1"/><circle cx="6" cy="6" r="1"/><circle cx="2" cy="10.5" r="1"/><circle cx="6" cy="10.5" r="1"/></svg>
-      </div>
+  poolTasks.forEach((task, idx) => {
+    itemsHtml += `<div class="pool-item" draggable="true" data-pid="${task.id}" data-pidx="${idx}"
+      ondragstart="onPoolDragStart(event,${idx})" ondragend="onDragEnd()">
+      <div class="pool-handle"><svg viewBox="0 0 8 12" fill="currentColor"><circle cx="2" cy="1.5" r="1"/><circle cx="6" cy="1.5" r="1"/><circle cx="2" cy="6" r="1"/><circle cx="6" cy="6" r="1"/><circle cx="2" cy="10.5" r="1"/><circle cx="6" cy="10.5" r="1"/></svg></div>
       <div class="pool-text" contenteditable="true"
         oninput="updatePoolText(${idx},this.textContent)"
         onkeydown="poolKeydown(event,${idx})">${task.text}</div>
@@ -657,11 +554,7 @@ function renderPoolCol() {
       </button>
     </div>`;
   });
-
-  return `<div class="pool-col"
-    ondragover="onPoolColDragOver(event)"
-    ondragleave="onPoolColDragLeave(event)"
-    ondrop="onPoolColDrop(event)">
+  return `<div class="pool-col" ondragover="onPoolColDragOver(event)" ondragleave="onPoolColDragLeave(event)" ondrop="onPoolColDrop(event)">
     <div class="pool-header">
       <div class="pool-title"><span class="pool-title-icon">🗂</span> タスクプール</div>
       <div class="pool-count">${poolTasks.length}</div>
@@ -671,31 +564,23 @@ function renderPoolCol() {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
       追加
     </button>
-    <div class="pool-hint">曜日欄にドラッグして振り分け✦</div>
+    <div class="pool-hint">曜日欄にドラッグして振り分け✦<br>今日のタスクは★でトップ3に設定</div>
   </div>`;
 }
 
 function render() {
-  const rowTop = document.getElementById('rowTop');
-  const rowBottom = document.getElementById('rowBottom');
-
   const weekEnd = new Date(currentWeekStart); weekEnd.setDate(weekEnd.getDate()+6);
   document.getElementById('weekLabel').textContent =
     `${MONTHS_EN[currentWeekStart.getMonth()]} ${currentWeekStart.getDate()} – ${MONTHS_EN[weekEnd.getMonth()]} ${weekEnd.getDate()}, ${weekEnd.getFullYear()}`;
 
-  // Build days: index 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
   const days = [];
-  for(let i=0; i<7; i++){
-    const d=new Date(currentWeekStart); d.setDate(d.getDate()+i);
-    days.push({ d, key:dateKey(d) });
+  for (let i=0; i<7; i++) {
+    const d = new Date(currentWeekStart); d.setDate(d.getDate()+i);
+    days.push({ d, key: dateKey(d) });
   }
+  document.getElementById('rowTop').innerHTML = days.slice(0,4).map(({d,key})=>renderDayCol(d,key)).join('');
+  document.getElementById('rowBottom').innerHTML = days.slice(4,7).map(({d,key})=>renderDayCol(d,key)).join('') + renderPoolCol();
 
-  // Row top: Mon(0), Tue(1), Wed(2), Thu(3)
-  rowTop.innerHTML = days.slice(0,4).map(({d,key})=>renderDayCol(d,key)).join('');
-  // Row bottom: Fri(4), Sat(5), Sun(6), Pool
-  rowBottom.innerHTML = days.slice(4,7).map(({d,key})=>renderDayCol(d,key)).join('') + renderPoolCol();
-
-  // Progress (week tasks only)
   let total=0, done=0;
   Object.values(weekTasks).forEach(arr=>{ total+=arr.length; done+=arr.filter(t=>t.done).length; });
   const pct = total>0 ? Math.round(done/total*100) : 0;
@@ -703,7 +588,21 @@ function render() {
   document.getElementById('progressText').textContent = total>0 ? `${done}/${total} done ✦ ${pct}%` : 'タスクを追加してね ✦';
 }
 
-render();
+function navigate(dir) {
+  currentWeekStart = new Date(currentWeekStart);
+  currentWeekStart.setDate(currentWeekStart.getDate() + dir*7);
+  loadWeek();
+}
+function goToday() { currentWeekStart = getMonday(new Date()); loadWeek(); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ── Init ──
+loadWeek();
 </script>
 </body>
 </html>
