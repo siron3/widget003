@@ -270,7 +270,7 @@ function isToday(d) {
   const t = new Date();
   return d.getFullYear()===t.getFullYear() && d.getMonth()===t.getMonth() && d.getDate()===t.getDate();
 }
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function uid() { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c==='x'?r:(r&0x3|0x8)).toString(16); }); }
 function setLoading(v) { document.getElementById('loadingBar').classList.toggle('visible', v); }
 
 // ── Load from Supabase ──
