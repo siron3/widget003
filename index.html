@@ -230,9 +230,9 @@ function getJapaneseHolidays(year) {
   for (const key of baseKeys) {
     const d = new Date(key); if (d.getDay() === 0) {
       const next = new Date(d); next.setDate(next.getDate()+1);
-      const nk = dateKey(next);
-      while(holidays[nk]){ next.setDate(next.getDate()+1); }
-      holidays[dateKey(next)] = '振替休日';
+      let count = 0;
+      while(holidays[dateKey(next)] && count < 7){ next.setDate(next.getDate()+1); count++; }
+      if (count < 7) holidays[dateKey(next)] = '振替休日';
     }
   }
   for (const key of Object.keys(holidays)) {
