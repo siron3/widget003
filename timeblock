@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Time Block</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky-pale: #dff0f7;
+    --sky: #a8d8ea;
+    --sky-mid: #7ec8e3;
+    --brown: #6b4f3a;
+    --brown-light: #a0785a;
+    --brown-pale: #f5ede8;
+    --text: #3a2e28;
+    --text-mid: #7a6560;
+    --text-light: #b0a09a;
+    --border: #d8e8f0;
+    --white: #ffffff;
+    --radius: 10px;
+
+    /* ブロックカラー */
+    --c-work:    #7ec8e3;
+    --c-lunch:   #f0c27f;
+    --c-oshi:    #c9a6d4;
+    --c-trpg:    #a8d4a8;
+    --c-travel:  #f0a898;
+    --c-self:    #f7d6a0;
+    --c-rest:    #b8c8e0;
+    --c-out:     #a8c8b8;
+    --c-custom:  #d4b8a8;
+    --c-study:   #98c4e0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', 'Noto Sans JP', sans-serif;
+    background: var(--sky-pale);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── ヘッダー ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding: 0 2px;
+  }
+
+  .header-date {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .date-main {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--brown);
+  }
+
+  .date-day {
+    font-size: 13px;
+    color: var(--text-mid);
+    font-weight: 400;
+  }
+
+  .header-nav {
+    display: flex;
+    gap: 6px;
+  }
+
+  .nav-btn {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--brown-light);
+    transition: all 0.15s;
+    font-size: 13px;
+  }
+  .nav-btn:hover { background: var(--sky); border-color: var(--sky-mid); color: var(--brown); }
+
+  .today-btn {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 0 10px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-mid);
+    transition: all 0.15s;
+  }
+  .today-btn:hover { background: var(--sky); color: var(--brown); }
+
+  /* ── メインレイアウト ── */
+  .main {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+
+  /* ── プリセットパネル ── */
+  .preset-panel {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    padding: 12px;
+    position: sticky;
+    top: 16px;
+  }
+
+  .preset-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-light);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .preset-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+
+  .preset-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    cursor: grab;
+    border: 1.5px solid transparent;
+    transition: all 0.15s;
+    user-select: none;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .preset-chip:hover { transform: translateX(2px); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .preset-chip:active { cursor: grabbing; }
+
+  .preset-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .chip-work    { background: color-mix(in srgb, var(--c-work) 15%, white);    border-color: color-mix(in srgb, var(--c-work) 30%, white); }
+  .chip-lunch   { background: color-mix(in srgb, var(--c-lunch) 15%, white);   border-color: color-mix(in srgb, var(--c-lunch) 30%, white); }
+  .chip-oshi    { background: color-mix(in srgb, var(--c-oshi) 15%, white);    border-color: color-mix(in srgb, var(--c-oshi) 30%, white); }
+  .chip-trpg    { background: color-mix(in srgb, var(--c-trpg) 15%, white);    border-color: color-mix(in srgb, var(--c-trpg) 30%, white); }
+  .chip-travel  { background: color-mix(in srgb, var(--c-travel) 15%, white);  border-color: color-mix(in srgb, var(--c-travel) 30%, white); }
+  .chip-self    { background: color-mix(in srgb, var(--c-self) 15%, white);    border-color: color-mix(in srgb, var(--c-self) 30%, white); }
+  .chip-rest    { background: color-mix(in srgb, var(--c-rest) 15%, white);    border-color: color-mix(in srgb, var(--c-rest) 30%, white); }
+  .chip-out     { background: color-mix(in srgb, var(--c-out) 15%, white);     border-color: color-mix(in srgb, var(--c-out) 30%, white); }
+  .chip-custom  { background: color-mix(in srgb, var(--c-custom) 15%, white);  border-color: color-mix(in srgb, var(--c-custom) 30%, white); }
+  .chip-study   { background: color-mix(in srgb, var(--c-study) 15%, white);   border-color: color-mix(in srgb, var(--c-study) 30%, white); }
+
+  /* カスタム追加 */
+  .custom-add {
+    display: flex;
+    gap: 5px;
+    margin-top: 4px;
+  }
+  .custom-input {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--sky-pale);
+    outline: none;
+  }
+  .custom-input:focus { border-color: var(--sky-mid); }
+  .custom-add-btn {
+    background: var(--sky);
+    border: none;
+    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    color: var(--brown);
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .custom-add-btn:hover { background: var(--sky-mid); }
+
+  /* クリア */
+  .clear-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 6px;
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--text-light);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+  .clear-btn:hover { border-color: #f0a898; color: #d07060; }
+
+  /* ── タイムライン ── */
+  .timeline-wrap {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+  }
+
+  .timeline {
+    position: relative;
+    padding: 0;
+  }
+
+  .hour-row {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    border-bottom: 1px solid var(--border);
+    min-height: 52px;
+    position: relative;
+    transition: background 0.1s;
+  }
+  .hour-row:last-child { border-bottom: none; }
+  .hour-row.drag-over { background: color-mix(in srgb, var(--sky) 20%, white); }
+
+  .hour-label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-light);
+    padding: 6px 8px 0 10px;
+    padding-top: 8px;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .hour-slot {
+    position: relative;
+    padding: 4px 8px 4px 4px;
+    min-height: 52px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  /* ブロック */
+  .time-block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: default;
+    border: 1.5px solid transparent;
+    animation: blockIn 0.2s ease;
+    gap: 6px;
+  }
+
+  @keyframes blockIn {
+    from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .block-label { flex: 1; }
+
+  .block-time-range {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    opacity: 0.65;
+    white-space: nowrap;
+  }
+
+  .block-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.4;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0 2px;
+    transition: opacity 0.15s;
+  }
+  .block-del:hover { opacity: 0.9; }
+
+  /* 現在時刻インジケーター */
+  .time-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .indicator-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #e05a5a;
+    margin-left: 38px;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(224,90,90,0.25);
+  }
+
+  .indicator-line {
+    flex: 1;
+    height: 1.5px;
+    background: #e05a5a;
+    opacity: 0.7;
+  }
+
+  .indicator-time {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    color: #e05a5a;
+    margin-right: 8px;
+    font-weight: 500;
+  }
+
+  /* ドラッグオーバーレイ */
+  .drop-hint {
+    font-size: 10px;
+    color: var(--text-light);
+    padding: 3px 6px;
+    border: 1.5px dashed var(--border);
+    border-radius: 6px;
+    text-align: center;
+    display: none;
+  }
+  .hour-row.drag-over .drop-hint { display: block; }
+
+  /* スクロールバー */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--sky-pale); }
+  ::-webkit-scrollbar-thumb { background: var(--sky); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--sky-mid); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-date">
+    <span class="date-main" id="dateMain"></span>
+    <span class="date-day" id="dateDay"></span>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center;">
+    <button class="nav-btn" onclick="changeDay(-1)">‹</button>
+    <button class="today-btn" onclick="goToday()">今日</button>
+    <button class="nav-btn" onclick="changeDay(1)">›</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- プリセットパネル -->
+  <div class="preset-panel">
+    <div class="preset-title">ブロックを追加</div>
+    <div class="preset-list" id="presetList">
+      <div class="preset-chip chip-work"   draggable="true" ondragstart="onPresetDrag(event,'仕事','work')">
+        <div class="preset-dot" style="background:var(--c-work)"></div>🏢 仕事
+      </div>
+      <div class="preset-chip chip-lunch"  draggable="true" ondragstart="onPresetDrag(event,'昼休み','lunch')">
+        <div class="preset-dot" style="background:var(--c-lunch)"></div>🍱 昼休み
+      </div>
+      <div class="preset-chip chip-oshi"   draggable="true" ondragstart="onPresetDrag(event,'推し活','oshi')">
+        <div class="preset-dot" style="background:var(--c-oshi)"></div>💜 推し活
+      </div>
+      <div class="preset-chip chip-trpg"   draggable="true" ondragstart="onPresetDrag(event,'TRPG','trpg')">
+        <div class="preset-dot" style="background:var(--c-trpg)"></div>🎲 TRPG
+      </div>
+      <div class="preset-chip chip-travel" draggable="true" ondragstart="onPresetDrag(event,'外出準備','travel')">
+        <div class="preset-dot" style="background:var(--c-travel)"></div>🎒 外出準備
+      </div>
+      <div class="preset-chip chip-study"  draggable="true" ondragstart="onPresetDrag(event,'勉強','study')">
+        <div class="preset-dot" style="background:var(--c-study)"></div>📚 勉強
+      </div>
+      <div class="preset-chip chip-self"   draggable="true" ondragstart="onPresetDrag(event,'セルフケア','self')">
+        <div class="preset-dot" style="background:var(--c-self)"></div>🛁 セルフケア
+      </div>
+      <div class="preset-chip chip-rest"   draggable="true" ondragstart="onPresetDrag(event,'休憩','rest')">
+        <div class="preset-dot" style="background:var(--c-rest)"></div>😴 休憩
+      </div>
+      <div class="preset-chip chip-out"    draggable="true" ondragstart="onPresetDrag(event,'外出','out')">
+        <div class="preset-dot" style="background:var(--c-out)"></div>🏃 外出
+      </div>
+    </div>
+
+    <div class="preset-title">カスタム追加</div>
+    <div class="custom-add">
+      <input class="custom-input" id="customName" placeholder="ブロック名" maxlength="12"
+        onkeydown="if(event.key==='Enter')addCustom()">
+      <button class="custom-add-btn" onclick="addCustom()">+</button>
+    </div>
+
+    <button class="clear-btn" onclick="clearDay()">🗑 今日をクリア</button>
+  </div>
+
+  <!-- タイムライン -->
+  <div class="timeline-wrap">
+    <div class="timeline" id="timeline"></div>
+  </div>
+
+</div>
+
+<script>
+// ── Supabase ──
+const SUPABASE_URL = 'https://nbduyknklcwqbinvhoih.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5iZHV5a25rbGN3cWJpbnZob2loIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NjMzNjUsImV4cCI6MjA4NzIzOTM2NX0.kzZYqBwfc8vpGszN2W3so2jURsZXlrve4KvUydYKIfA'; // ← 新しいキーをここに貼る
+
+async function sbFetch(path, options = {}) {
+  const { headers: extraHeaders, ...rest } = options;
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    ...rest,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      ...(extraHeaders || {})
+    }
+  });
+  if (res.status === 204) return null;
+  if (!res.ok) throw new Error(await res.text());
+  const t = await res.text();
+  return t ? JSON.parse(t) : null;
+}
+
+// ── 定数 ──
+const HOURS = Array.from({length: 19}, (_, i) => i + 6); // 6〜24時
+const DAYS_JP = ['日','月','火','水','木','金','土'];
+const COLOR_MAP = {
+  work:'#7ec8e3', lunch:'#f0c27f', oshi:'#c9a6d4',
+  trpg:'#a8d4a8', travel:'#f0a898', self:'#f7d6a0',
+  rest:'#b8c8e0', out:'#a8c8b8', study:'#98c4e0', custom:'#d4b8a8'
+};
+
+// ── 状態 ──
+let currentDate = new Date();
+currentDate.setHours(0,0,0,0);
+let blocks = {}; // { 'YYYY-MM-DD': [{label, color, hour, id}] }
+let dragLabel = null, dragColor = null;
+let isSaving = false;
+
+function dateKey(d) {
+  const offset = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - offset * 60000);
+  return local.toISOString().slice(0,10);
+}
+
+async function loadBlocks() {
+  const key = dateKey(currentDate);
+  try {
+    const rows = await sbFetch(`timeblocks?date=eq.${key}&select=*`);
+    if (rows && rows.length > 0) {
+      blocks[key] = JSON.parse(rows[0].blocks_json || '[]');
+    } else {
+      blocks[key] = [];
+    }
+  } catch(e) {
+    console.error('読み込みエラー:', e);
+    blocks[key] = [];
+  }
+}
+
+async function saveBlocks() {
+  if (isSaving) return;
+  isSaving = true;
+  const key = dateKey(currentDate);
+  const json = JSON.stringify(blocks[key] || []);
+  try {
+    // upsert（あれば更新、なければ挿入）
+    await sbFetch('timeblocks', {
+      method: 'POST',
+      headers: { 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ date: key, blocks_json: json })
+    });
+  } catch(e) {
+    console.error('保存エラー:', e);
+  } finally {
+    isSaving = false;
+  }
+}
+
+// ── 日付表示 ──
+function updateHeader() {
+  const d = currentDate;
+  const m = d.getMonth()+1, day = d.getDate();
+  document.getElementById('dateMain').textContent = `${d.getFullYear()}/${String(m).padStart(2,'0')}/${String(day).padStart(2,'0')}`;
+  document.getElementById('dateDay').textContent = `(${DAYS_JP[d.getDay()]})`;
+}
+
+function changeDay(n) {
+  currentDate.setDate(currentDate.getDate() + n);
+  render();
+}
+function goToday() {
+  currentDate = new Date(); currentDate.setHours(0,0,0,0);
+  render();
+}
+
+// ── ドラッグ ──
+function onPresetDrag(e, label, colorKey) {
+  dragLabel = label;
+  dragColor = COLOR_MAP[colorKey] || COLOR_MAP.custom;
+  e.dataTransfer.effectAllowed = 'copy';
+}
+
+function onHourDragOver(e, hour) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  document.querySelectorAll('.hour-row').forEach(r => r.classList.remove('drag-over'));
+  document.getElementById('row-'+hour).classList.add('drag-over');
+}
+function onHourDragLeave(e) {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    e.currentTarget.classList.remove('drag-over');
+  }
+}
+async function onHourDrop(e, hour) {
+  e.preventDefault();
+  document.querySelectorAll('.hour-row').forEach(r => r.classList.remove('drag-over'));
+  if (!dragLabel) return;
+  const key = dateKey(currentDate);
+  if (!blocks[key]) blocks[key] = [];
+  const exists = blocks[key].some(b => b.hour === hour && b.label === dragLabel);
+  if (!exists) {
+    blocks[key].push({ id: Date.now(), label: dragLabel, color: dragColor, hour });
+    blocks[key].sort((a,b) => a.hour - b.hour);
+    renderTimeline();
+    await saveBlocks();
+  }
+  dragLabel = null; dragColor = null;
+}
+
+// ── ブロック削除 ──
+async function deleteBlock(id) {
+  const key = dateKey(currentDate);
+  if (blocks[key]) {
+    blocks[key] = blocks[key].filter(b => b.id !== id);
+    renderTimeline();
+    await saveBlocks();
+  }
+}
+
+// ── カスタム追加 ──
+function addCustom() {
+  const inp = document.getElementById('customName');
+  const name = inp.value.trim();
+  if (!name) return;
+  dragLabel = name;
+  dragColor = COLOR_MAP.custom;
+  const list = document.getElementById('presetList');
+  const chip = document.createElement('div');
+  chip.className = 'preset-chip chip-custom';
+  chip.draggable = true;
+  chip.innerHTML = `<div class="preset-dot" style="background:var(--c-custom)"></div>${name}`;
+  chip.addEventListener('dragstart', e => onPresetDrag(e, name, 'custom'));
+  list.appendChild(chip);
+  inp.value = '';
+}
+
+// ── クリア ──
+async function clearDay() {
+  if (!confirm('今日のブロックをすべて削除しますか？')) return;
+  const key = dateKey(currentDate);
+  blocks[key] = [];
+  renderTimeline();
+  await saveBlocks();
+}
+
+// ── タイムライン描画 ──
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  const key = dateKey(currentDate);
+  const dayBlocks = blocks[key] || [];
+  const now = new Date();
+  const isToday = dateKey(currentDate) === dateKey(now);
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  let html = '';
+  HOURS.forEach(hour => {
+    const hBlocks = dayBlocks.filter(b => b.hour === hour);
+    const rowMinutes = hour * 60;
+    const rowEndMinutes = rowMinutes + 60;
+    const showIndicator = isToday && nowMinutes >= rowMinutes && nowMinutes < rowEndMinutes;
+    const indicatorPct = ((nowMinutes - rowMinutes) / 60 * 100).toFixed(1);
+
+    html += `<div class="hour-row" id="row-${hour}"
+      ondragover="onHourDragOver(event,${hour})"
+      ondragleave="onHourDragLeave(event)"
+      ondrop="onHourDrop(event,${hour})">
+      <div class="hour-label">${String(hour).padStart(2,'0')}:00</div>
+      <div class="hour-slot">`;
+
+    if (showIndicator) {
+      const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      html += `<div class="time-indicator" style="top:${indicatorPct}%;position:absolute;left:0;right:0;">
+        <div class="indicator-dot"></div>
+        <div class="indicator-line"></div>
+        <div class="indicator-time">${timeStr}</div>
+      </div>`;
+    }
+
+    hBlocks.forEach(b => {
+      const textColor = getTextColor(b.color);
+      const bgColor = b.color + '33';
+      const borderColor = b.color + '88';
+      html += `<div class="time-block" style="background:${bgColor};border-color:${borderColor};color:${textColor};">
+        <span class="block-label">${b.label}</span>
+        <span class="block-time-range">${String(hour).padStart(2,'0')}:00</span>
+        <button class="block-del" onclick="deleteBlock(${b.id})">×</button>
+      </div>`;
+    });
+
+    if (hBlocks.length === 0) {
+      html += `<div class="drop-hint">ここにドロップ</div>`;
+    }
+
+    html += `</div></div>`;
+  });
+
+  tl.innerHTML = html;
+
+  // 今日の場合は現在時刻の行にスクロール
+  if (isToday) {
+    const currentHour = now.getHours();
+    const row = document.getElementById('row-' + currentHour);
+    if (row) setTimeout(() => row.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+  }
+}
+
+function getTextColor(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return (r*0.299 + g*0.587 + b*0.114) > 150 ? '#3a2e28' : '#ffffff';
+}
+
+// ── 現在時刻インジケーター更新 ──
+function updateIndicator() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  if (dateKey(currentDate) === dateKey(today)) {
+    renderTimeline();
+  }
+}
+
+// ── 初期化 ──
+async function render() {
+  updateHeader();
+  await loadBlocks();
+  renderTimeline();
+}
+
+render();
+setInterval(updateIndicator, 60000); // 1分ごとに更新
+</script>
+</body>
+</html>
