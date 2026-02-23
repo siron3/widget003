@@ -31,6 +31,7 @@
     --c-out:     #a8c8b8;
     --c-custom:  #d4b8a8;
     --c-study:   #98c4e0;
+    --c-task:    #b8d4b8;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -173,6 +174,7 @@
   .chip-out     { background: color-mix(in srgb, var(--c-out) 15%, white);     border-color: color-mix(in srgb, var(--c-out) 30%, white); }
   .chip-custom  { background: color-mix(in srgb, var(--c-custom) 15%, white);  border-color: color-mix(in srgb, var(--c-custom) 30%, white); }
   .chip-study   { background: color-mix(in srgb, var(--c-study) 15%, white);   border-color: color-mix(in srgb, var(--c-study) 30%, white); }
+  .chip-task    { background: color-mix(in srgb, var(--c-task) 15%, white);    border-color: color-mix(in srgb, var(--c-task) 30%, white); }
 
   /* カスタム追加 */
   .custom-add {
@@ -249,13 +251,14 @@
   .hour-row.drag-over { background: color-mix(in srgb, var(--sky) 20%, white); }
 
   .hour-label {
-    font-size: 10px;
+    font-size: 11px;
     font-family: 'DM Mono', monospace;
-    color: var(--text-light);
+    color: var(--text-mid);
     padding: 6px 8px 0 10px;
     padding-top: 8px;
     line-height: 1;
     user-select: none;
+    font-weight: 500;
   }
 
   .hour-slot {
@@ -402,6 +405,9 @@
       <div class="preset-chip chip-study"  draggable="true" ondragstart="onPresetDrag(event,'勉強','study')">
         <div class="preset-dot" style="background:var(--c-study)"></div>📚 勉強
       </div>
+      <div class="preset-chip chip-task"   draggable="true" ondragstart="onPresetDrag(event,'作業','task')">
+        <div class="preset-dot" style="background:var(--c-task)"></div>💻 作業
+      </div>
       <div class="preset-chip chip-self"   draggable="true" ondragstart="onPresetDrag(event,'セルフケア','self')">
         <div class="preset-dot" style="background:var(--c-self)"></div>🛁 セルフケア
       </div>
@@ -458,7 +464,7 @@ const DAYS_JP = ['日','月','火','水','木','金','土'];
 const COLOR_MAP = {
   work:'#7ec8e3', lunch:'#f0c27f', oshi:'#c9a6d4',
   trpg:'#a8d4a8', travel:'#f0a898', self:'#f7d6a0',
-  rest:'#b8c8e0', out:'#a8c8b8', study:'#98c4e0', custom:'#d4b8a8'
+  rest:'#b8c8e0', out:'#a8c8b8', study:'#98c4e0', task:'#b8d4b8', custom:'#d4b8a8'
 };
 
 // ── 状態 ──
@@ -466,7 +472,6 @@ let currentDate = new Date();
 currentDate.setHours(0,0,0,0);
 let blocks = {}; // { 'YYYY-MM-DD': [{label, color, hour, id}] }
 let dragLabel = null, dragColor = null;
-let isSaving = false;
 
 function dateKey(d) {
   const offset = d.getTimezoneOffset();
@@ -490,12 +495,9 @@ async function loadBlocks() {
 }
 
 async function saveBlocks() {
-  if (isSaving) return;
-  isSaving = true;
   const key = dateKey(currentDate);
   const json = JSON.stringify(blocks[key] || []);
   try {
-    // upsert（あれば更新、なければ挿入）
     await sbFetch('timeblocks', {
       method: 'POST',
       headers: { 'Prefer': 'resolution=merge-duplicates' },
@@ -503,8 +505,6 @@ async function saveBlocks() {
     });
   } catch(e) {
     console.error('保存エラー:', e);
-  } finally {
-    isSaving = false;
   }
 }
 
