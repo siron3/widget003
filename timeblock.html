@@ -499,9 +499,12 @@ async function saveBlocks() {
   const key = dateKey(currentDate);
   const json = JSON.stringify(blocks[key] || []);
   try {
+    // まず既存レコードを削除してから新規挿入（確実に上書き）
+    await sbFetch(`timeblocks?date=eq.${key}`, {
+      method: 'DELETE'
+    });
     await sbFetch('timeblocks', {
       method: 'POST',
-      headers: { 'Prefer': 'resolution=merge-duplicates' },
       body: JSON.stringify({ date: key, blocks_json: json })
     });
   } catch(e) {
